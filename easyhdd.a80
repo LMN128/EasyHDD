@@ -1,0 +1,1074 @@
+;LMN Patch (EasyHDD) build on Dron's HDDpatch 1.62
+;public version for GIT
+
+;verze 1.05
+;- nova DMA sekvence umoznujici pouziti i originalniho Z80-DMA chipu
+;- oprava chyby ve zvukovem efektu
+;- oprava detekce jednotky @127
+;- upravena DMAOUT sekvence pro pouziti s originalnim Z80DMA obvodem
+;verze 1.04
+;- do VDT pridano General setting
+;- pri autoconfiguraci se do VDT (CHS udaje) zapisuji zjistene udaje
+;- vypocet prvniho datoveho sectoru
+;- pridany zvukove efekty (diky pro Factor6)
+;verze 1.03
+;- pridano GUI
+;- zobrazovani CHS a kapacity disku
+;- graficka uprava
+;-vsechny loga prevedeny do formatu SpriteEditoru typ 2
+;verze 1.02
+;- odstranen nadbytecny kod ze zdrojaku
+;- opraveny chyby
+;- prvni funkcni verze
+;- pridana obsluha WriteProtect a master/slave
+;- kontrola DMA prog. sekvence, orig. Z80DMA ready (nutno vyzkouset)
+;verze 1.01 
+;- zruseny vsechny rezimy krome LBA, podpora zatim pouze master disku a wp disable
+;- nova VDT tabulka
+;verze 1.00 
+;- upraveno pro preklad SjASM   
+;- zrusena modifikace portu, nyni jsou porty natvrdo, pro jine je treba nova kompilace
+
+
+;poznamky
+;-pri formatovani pres ff17, se disk formatuje presto ze je WP. Chyba se projevi az na konci. Delal to i hddpatch 162.
+
+;pouziva dma prenosy
+;kapacita diskimage - 2MB
+;diskimage format   - 128x8x2
+;slave/master, write protect
+;------------------------------
+
+
+         org  25000
+;incbin   "mon2+.bin"
+         org  32768
+         call GUI.gui
+         jp   INSTALL
+
+;virtual (floppy)disk table
+;General settings
+@autoinstall				db 0	;auto install (/wait for any key)
+@autoconfig					db 1	;auto configure (automatic search for first sector & set hdd parameters to VDT)
+@showsplash					db 1	;show splash screen
+@playnoise					db 1  ;playnoise
+										db 1  ;show gui
+@noverify 					db 0	;disable write verify
+@dmar3							db 1	;install dma patch (oprava hodnoty dma registru R3)
+;master disk
+VDT	      db 32,16 ;Sectors/Heads
+					dw 980;Cylinders
+					db 0; Write protect
+					dw 128 ; first LBA sector of first file on disk
+;slave disk
+		      db 32,16 ;Sectors/Heads
+					dw 980;Cylinders
+					db 0; Write protect
+					dw 128 ; first LBA sector of first file on disk
+
+VDTLEN		equ $-VDT
+
+;porty hdd interface DRON		 
+P_DAT    equ 195
+P_ERR    equ 199
+P_HSE    equ 203
+P_NSE    equ 207
+P_CYL    equ 211
+P_CYH    equ 215
+P_HEA    equ 219
+P_COM    equ 223
+
+/*
+;porty hdd interface PVL
+P_DAT    equ 163
+P_ERR    equ 167
+P_HSE    equ 171
+P_NSE    equ 175
+P_CYL    equ 179
+P_CYH    equ 183
+P_HEA    equ 187
+P_COM    equ 191
+*/
+;MB02 porty
+DMA      equ  11
+;;;;;;;;;;;;;;;;;;;;;
+; Instalace driveru ;
+;;;;;;;;;;;;;;;;;;;;;
+INSTALL  di
+
+;;presun fontu do HDD banky
+         ld   hl,15616
+         ld   de,endfile
+         ld   bc,768
+         ldir
+
+         ld   hl,VDT
+         ld   de,TAB
+         ld   bc,VDTLEN
+         ldir
+
+         ld   a,97
+         out  (23),a
+
+         ld   hl,ADR20
+         ld   de,20
+         ld   bc,12
+         ldir
+
+         ld   hl,ADR35
+         ld   de,35
+         ld   c,5
+         ldir
+
+;         ld   hl,ADR43
+;         ld   de,43
+;         ld   c,5
+;         ldir
+
+         ld   hl,ADR62
+         ld   de,62
+         ld   c,11
+         ldir
+         
+;set no_verify patch
+					ld a,(@noverify)
+					or a
+					jr z,verifyyes
+					
+					ld a,(#13CA)
+					cp 205
+					jr nz,verifyyes ; alespon nejaka kontrola, jesli se upravuje spravne misto
+;uprava dle BUSYho
+  				ld a,#21
+          ld   (#13CA),a ; patch ROM obsluhy #04C6
+          ld a,(#1447)
+					cp 205
+					jr nz,verifyyes ; alespon nejaka kontrola, jesli se upravuje spravne misto
+          ld a,#C3
+          ld   (#1447),a ; patch sluzby #25 SAVEX
+
+/* noverify podle drona ; proc se skace na adresu 62?					
+         ld   a,205
+         ld   (#13CA),a
+         ld   hl,62
+         ld   (#13CA+1),hl
+*/
+
+verifyyes
+;dmapatch; uprava cele DMA sekvence pro pouziti i originalniho Z80-DMA chipu
+					ld a,(@dmar3)
+					or a
+					jr z,dmano
+					
+					ld a,(#1BA)
+					cp #C3
+					jr nz,dmano ; alespon nejaka kontrola, jesli se upravuje spravne misto
+					ld a,(#1BB)
+					cp #C7
+					jr nz,dmano ; alespon nejaka kontrola, jesli se upravuje spravne misto
+;prepsani sekvence
+					ld hl,ADR442
+          ld de,#1BA ;442
+          ld bc,17
+          ldir
+;prepsani odkazu do nove sekvence
+					ld a,#1c8
+					ld (#148),a
+					ld (#166),a
+					ld a,#1bc
+					ld (#144),a
+					ld (#162),a
+					ld a,#1BE
+					ld (#1B7),a
+dmano
+
+         ld   hl,SEM
+         ld   de,144
+         ld   bc,112
+         ldir
+
+         ld   a,98
+         out  (23),a
+
+         ld   hl,ADR16
+         ld   de,0
+         ld   bc,33+8
+;bez inir
+         ldir
+
+         ld   hl,201*256+251
+         ld   (56),hl
+
+         ld   hl,SEM1
+         ld   de,144
+         ld   bc,LEN
+         ldir
+;;presun fontu do HDD banky
+
+         ld   hl,endfile
+         ld   de,15616
+         ld   bc,768
+         ldir
+
+         ld   a,%01000000
+         out  (23),a
+         ei
+         ret
+;------------------------------
+;------------------------------
+ADR442
+
+		db	$c3				;stop DMA
+		db	$79				;r0 must be temporary B->A for Zilog DMA
+  	dw	$5555			;rd:kam
+  	dw	$ffff			;dlzka
+		db	$14				;r1
+		db	$28				;r2
+		db	$80				;r3
+		db	$8d				;r4
+		dw	$006f			;rd:odkud (fdd)
+		db	$92				;r5 Zmena:Enable wait state
+		db	$cf				;zapis udajov do kanalu B
+  	db	$01				;r0 rd:B->A wr:A->B
+		db	$cf,$87				;zapis udajov,start
+
+;------------------------------
+;------------------------------
+;adresa 62 v dos_bnk
+ADR62
+         ld   c,a		;test, jestli je treba verify
+         ld   a,(#03EF)		;to pujde do dosu urcite
+         cp   5
+         ld   a,c
+         ret  nc
+         jp   #1463
+
+;------------------------------
+;------------------------------
+
+;adresa 20 v dos_bnk
+;hdd_bnk musi byt dos_bnk+1
+
+ADR20
+         ld   (hl),b		;zapis bajtu do dos_bnk
+         inc  a			;to by se melo taky hodit jinam
+         out  (23),a
+         jp   144
+
+;adresa 27
+         ld   a,98		;prestrankovani do patch_bnk
+         out  (23),a
+         ret
+
+;------------------------------
+;------------------------------
+
+;adresa 35 v dos_bnk
+
+ADR35
+         out  (c),b		;start dma prenosu a prestrankovani z5
+         inc  a
+         out  (23),a
+
+;------------------------------
+;------------------------------
+
+;adresa 43 v dos_bnk
+
+;ADR43
+;         inir			;puvodni non-dma prenos
+;         inc  a
+;         out  (23),a
+
+;------------------------------
+;------------------------------
+
+;------------------------------
+;------------------------------
+
+;adresa 16 v hdd_bnk
+
+;INIR     equ  41
+OTIR     equ  33
+
+ADR16
+         di
+         xor  a
+         ld   de,65535
+         jp   5
+         db "HddDrive"
+
+         ld   a,97
+         out  (23),a
+         ld   (hl),b
+         inc  a
+         out  (23),a
+         ret
+         nop
+         nop
+;adr27 - route to hdd_bnk
+         ld   a,97
+         out  (23),a
+         db 24,111
+;jr   144
+
+;adr33 - route to otir
+;musi byt ld  a,97
+;a taky ld bc,data_port
+         out  (23),a
+         out  (c),a
+         inc  a
+         out  (23),a
+         ret
+
+;adr41
+;musi byt ld  a,97
+;a taky ld bc,data_port
+;         out  (23),a
+;         inir
+;         inc  a
+;         out  (23),a
+;         ret
+
+;------------------------------
+;------------------------------
+;adresa 144 v dos_bnk
+
+
+SEM
+         DISP  144
+;;         DISP SEM
+;;         put  SEM
+
+
+ADR144D
+         push hl
+         ld   hl,255
+         ld   (hl),a
+         dec  hl
+         ex   (sp),hl
+
+         cp   12
+;         jr   z,PRYC
+         jr   c,SKIP1
+         cp   15
+         jr   c,SLUZ1214
+SKIP1
+         cp   16
+         jr   z,SETMLT
+         or   a
+         ret  z
+         cp   15
+         ret  nc
+ACT      ret
+
+         inc  sp
+         inc  sp
+AAA
+         cp   4
+         jr   c,LOOP12
+         cp   6
+         jr   c,RDWRSEC
+LOOP12   cp   7
+         jr   z,RDWRSEC
+         xor  a
+         ret
+
+
+RDWRSEC  push hl
+         push de
+         ld   b,a
+         ld   (SP_ST+1),sp
+         ld   sp,128		;!!!
+         call 27		;rutina v im2 by radeji nemela strankovat rom...
+SP_ST    ld   sp,0		;im1 fpohode, nmi nevim
+         push bc
+RUT      call NIC
+         pop  af
+         pop  de
+         pop  hl
+NIC      ret
+
+
+SETMLT   ld   a,h
+         or   l
+         jr   nz,LOOP14
+         ld   hl,NIC
+LOOP14   ld   (RUT+1),hl
+         ret
+
+
+SLUZ1214
+         push de
+         push hl
+         ld   b,a
+         ld   (SP_ST+1),sp
+         ld   sp,128
+         call 27
+         ld   sp,(SP_ST+1)
+         ld   a,b
+         pop  hl
+         or   a
+         jr   nz,NO_NFO
+         inc  sp
+         inc  sp
+         push de
+NO_NFO
+         pop  de
+         cp   255
+         ret  z
+;nz=hned se vrat
+;z=predej dal
+PRYC
+         inc  sp
+         inc  sp
+         ret
+
+         nop
+         nop
+
+A1_254
+         ld   a,85
+;tady je uz adresa 256
+
+
+;------------------------------
+; HDD banka
+;------------------------------
+					ent
+					
+SEM1     ;equ  $-ADR144D+SEM
+         disp  144
+;;         DISP SEM1
+;;         put  SEM1
+
+;adresa 144 v hdd_bnk
+
+KKK
+         jp   PRESKOC
+
+TAB      equ  $-KKK+SEM1
+TAB_DRV
+				 block VDTLEN	
+
+;; obsluha sluzeb bsdosu
+PRESKOC
+         push hl
+         ld   hl,RET
+         ex   (sp),hl
+
+         ld   a,b
+
+         cp   12
+         jr   z,AKTIVE1
+         cp   13
+         jr   z,PASIVE1
+         cp   14
+         jr   z,INFO1
+
+         cp   4
+; zmena, nyni se skace pouze na rutiny LBA         
+;SET_RDM
+				  jp   z,RD_SEC2
+         cp   5
+; zmena, nyni se skace pouze na rutiny LBA         
+         
+;SET_WRM1
+				 jp   z,WR_SEC2
+         cp   7
+         jp   z,WR_TRK
+         xor  a
+
+         ret
+
+
+RET
+         ld   b,a
+         jp   27
+
+
+;---------
+
+INFO1    ld   a,e
+         call TST_DRV
+         ld   a,255
+         ret  z
+         ld   de,128*256+3
+         xor  a
+         ret
+
+;---------
+
+PASIVE1  ld   a,201
+         ld   hl,ACT
+         ld   b,a
+         rst  16
+         ld   a,255
+         ret
+
+;---------
+
+AKTIVE1  call PASIVE1
+         ld   a,e
+         call TST_DRV
+         ld   a,255
+         ret  z
+         xor  a
+         ld   hl,ACT
+         ld   b,a
+         rst  16
+         ld   a,2
+         ret
+
+
+;------------------------------
+
+;------------------------------
+;vypocita log.cislo sektoru
+;z udaju pro disketu
+;hl se nezmeni, udaj je vlozen
+;primo do rutiny prepoc
+SECT_NUM
+
+         push hl
+         ld   l,d
+         ld   h,0
+         add  hl,hl
+         add  hl,hl
+         add  hl,hl
+         add  hl,hl
+;*16
+         ld   a,e
+         dec  a
+         and  %00000111
+         bit  7,e
+         jr   z,RDS1
+         or   %00001000
+RDS1
+         or   l
+         ld   l,a
+
+;hl = log. cislo sectoru
+;     pocita se od 0
+
+         add  hl,hl
+
+;jeste se vynasobi dvema
+;harddisk ma sektor 512 bajtu
+;musime precist dva sektory
+
+         ld   (PREPOC+1),hl
+         ld   a,h
+         pop  hl
+         and  %11110000
+         ret  z
+
+         ld   a,%00010000
+         or   a
+         ret
+;seek error (zapis za hranici)
+;------------------------------
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;pricte sector vyzadovany bsdosem k prvnimu LBA sectoru dane disk. jednotku
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+PREP_LBA
+PREPOC		ld hl,0
+LOW24			ld de,0
+					add hl,de
+HIG24		ld de,0
+					jr nc,PREP2
+					inc de			
+;b - hlavicka 219
+;c - sektor 207
+;de - cyl  e - 211, d -215
+PREP2
+         ld   b,d
+         ld   d,e
+         ld   e,h
+         ld   c,l
+         ret
+
+; fyzicke cteni sectoru
+READ1
+         call TST_BSY
+         jp   nz,ERROR
+         ld   a,b
+; nyni je navrdo LBA nastavuje se v rut. TST_DRV         
+HEA_RD1  or   %11100000
+         out  (P_HEA),a
+;cislo hlavicky
+
+         ld   a,2
+         out  (P_HSE),a
+;pocet sektoru
+
+         ld   a,c
+         out  (P_NSE),a
+;cislo sektoru od 1
+
+         ld   a,e
+         out  (P_CYL),a
+         ld   a,d
+         out  (P_CYH),a
+;cislo cylindru
+
+         ld   a,#21
+         out  (P_COM),a
+;read with retries
+
+         call TST_BSY
+         jr   nz,ERROR
+
+         call RD_512
+
+         call TST_ERR
+         jr   nz,ERROR
+
+         call TST_BSY
+         jr   nz,ERROR
+
+         call RD_512
+
+         call TST_ERR
+         jr   nz,ERROR
+
+         xor  a
+         ret
+
+;------------------------------
+; fyzicky zapis sectoru
+
+WRITE1
+
+         call TST_BSY
+         jr   nz,ERROR
+
+         ld   a,b
+; nyni je navrdo LBA nastavuje se v rut. TST_DRV         
+HEA_WR1  or   %11100000
+         out  (P_HEA),a
+;hlavicka
+
+         ld   a,2
+         out  (P_HSE),a
+;pocet sektoru
+         ld   a,c
+         out  (P_NSE),a
+;cislo sektoru od 1
+         ld   a,e
+         out  (P_CYL),a
+         ld   a,d
+         out  (P_CYH),a
+;cislo cylindru
+
+         ld   a,#31
+         out  (P_COM),a
+;write with retries
+
+         call TST_BSY
+         jr   nz,ERROR
+
+         call WR_512
+
+         call TST_BSY
+         jr   nz,ERROR
+         call TST_ERR
+         jr   nz,ERROR
+
+         call WR_512
+
+         call TST_BSY
+         jr   nz,ERROR
+         call TST_ERR
+         jr   nz,ERROR
+
+
+         xor  a
+         ret
+
+;------------------------------
+; fyzicky zapis tracku
+
+WR_TRK
+
+         ld   a,e
+         and  128
+         ld   e,a
+         xor  a
+WTRK1
+         inc  e
+         push de
+         push hl
+         push af
+; zmena, nyni se skace pouze na rutiny LBA                
+;SET_WRM2 
+					call WR_SEC2
+         pop  af
+         pop  hl
+         ld   de,1024
+         add  hl,de
+         pop  de
+         inc  a
+         cp   9
+;pocet sektoru -1
+         jr   nz,WTRK1
+
+         ret
+
+ERROR
+         cp   255
+         jr   nz,ERR1
+         ld   a,1
+         ret
+ERR1
+         and  %01010011
+         jr   z,ERR2
+         ld   a,8
+         ret
+ERR2
+         ld   a,128
+         ret
+
+;------------------------------
+;-------- LBA MODE 010 --------
+;------------------------------
+
+RD_SEC2
+; prepocita log. cislo BSDOS diskety na log. cislo hdd
+         call SECT_NUM
+         ret  nz
+
+; pricte pozadovany pocet LBA sektoru
+         push hl
+         call PREP_LBA
+         pop  hl
+; cte
+         call READ1
+
+         ret
+
+;------------------------------
+
+WR_SEC2
+;         ld   a,(WR_PROT+1)
+;zde se testoval write protect, musi se dodelat
+WR_PROT 	ld a,0
+         or   a
+         ld a,%01000000 ; status pro Bsdos - writeprotect
+         ret  nz
+
+         call SECT_NUM
+         ret  nz
+
+         push hl
+         call PREP_LBA
+         pop  hl
+
+         call WRITE1
+
+         ret
+
+
+;------------------------------
+;---- END OF LBA MODE 010 -----
+;------------------------------
+
+
+
+;------------------------------
+
+TST_BSY
+         push hl
+         push bc
+         ld   hl,0
+
+TST1
+         dec  hl
+         ld   a,l
+         or   h
+         jr   z,TOUT1
+P84      in   a,(P_COM)
+         inc  a
+         jr   z,P84
+         dec  a
+         bit  7,a
+         jr   nz,TST1
+         pop  bc
+         pop  hl
+         ret
+TOUT1
+         ld   a,255
+         or   a
+         pop  bc
+         pop  hl
+         ret
+
+;------------------------------
+
+TST_ERR
+P85      in   a,(P_COM)
+         inc  a
+         jr   z,P85
+         dec  a
+         and  1
+         ret  z
+         in   a,(P_ERR)
+         ret
+
+;------------------------------
+
+;------------------------------
+
+
+RD_512
+         ld   (DMA_ADR1),hl
+         push hl
+         ld   hl,DMA_IN
+         ld   bc,14*256+11
+         otir
+         ld   a,97
+         ld   b,#87
+         call OTIR
+; start DMA transfer
+         pop  hl
+         ld   bc,512
+         add  hl,bc
+         ret
+
+DMA_IN   db 195
+; reset
+
+;        db #C7
+; reset PA timing
+;        db #CB
+; reset PB timing
+; !!! to je zbytecne -> reset
+
+         db %01111101
+         dw P_DAT
+         dw 511
+; transfer,PA->PB
+; start adr
+; block length
+         db %00101100
+; PA is IO,fixed
+         db %00010000
+; PB is memory,inc
+
+
+;        db %11000100
+; ?
+
+
+         db %10101101
+DMA_ADR1 dw 0
+; continuous
+; starting address
+         db %10010010
+; stop on end,/CE/WAIT,Ready lo
+         db #CF
+; load
+         db #B3
+; force ready
+
+;-------------
+
+WR_512
+         ld   (DMA_ADR2),hl
+         push hl
+         ld   hl,DMA_OUT
+         ld   bc,((DMA_OUTEND-DMA_OUT)*256)+11
+         ld   a,97
+         otir
+         ld   a,97
+         ld   b,#87
+         call OTIR
+         pop  hl
+         ld   bc,512
+         add  hl,bc
+         ret
+; nova sekvence o pro DMAOUT kompatibilni s orig. Z80DMA         
+DMA_OUT
+				 db #C3       ;WR6-reset
+				 db %00000001 ;WR0-Temporarily declare Port B as source in WR0 (bit 2 = 0)
+         db %00010100 ;WR1-PA memory,increment
+         db %00101000 ;WR2-PB io, fixed
+         db %10000000 ;WR3
+         db %10101101 ;WR4-Write Port B (fixed destination) address to WR4.
+         dw P_DAT
+         db #CF       ;WR6-load
+         db %01111101 ;WR0-transfer,portA,block length
+DMA_ADR2 dw 0
+         dw 511
+         db %10010010 ;WR5-stop on end,/CE/WAIT,Ready low
+         db #CF       ;WR6-load
+         db #B3       ;WR6-force ready
+DMA_OUTEND
+/*
+DMA_OUT  db 195
+; reset
+
+;        db #C7
+; reset PA timing
+;        db #CB
+; reset PB timing
+
+         db %01111101 ;WR0 transfer,portA,block length
+DMA_ADR2 dw 0
+         dw 511
+; transfer,PA->PB
+; start adr
+; block length
+         db %00010100 ;WR1
+; PA is memory,inc
+         db %00101000 ;WR2
+; PB is IO,fixed
+
+;        db %11000100
+; ?
+
+         db %10101101 ;WR4
+         dw P_DAT
+; continuous
+; starting address
+         db %10010010 ;WR5
+; stop on end,/CE/WAIT,Ready lo
+         db #CF ;WR6
+; load
+         db #B3
+; force ready
+*/
+;------------------------------
+
+; tady se musi podle cisla disk. jednotky (napr. @4) urcit master/slave a cislo LBA sectoru
+; 3-127 master
+; 131-255 slave
+; 0,1,2,128,129,130 ret z a mozna a=0 jako nepouzite jednotky
+TST_DRV
+
+					ld d,a ; schovam a
+					inc a
+					jr z,slave ;@255 je OK a je slave
+					and %01111111
+					jr z,master ;@127 je OK
+					and %01111100
+					ret z ; test jednotek 0,1,2,128,129,130 ret z
+    			bit 7,d ;test master/slave
+					jr nz,slave
+master		ld hl,TAB_DRV
+					
+					ld a,(hl)
+					or a
+					ret z ; master disk neexistuje, testuje se pocest sectoru disku uvedeneho v VDT
+					
+					ld a,%11100000
+					ld (HEA_RD1+1),a
+					ld (HEA_WR1+1),a ; nastaveni master
+					
+					ld a,(TAB_DRV+4)
+					ld (WR_PROT+1),a ; nastaveni WriteProtect 
+					
+					ld  a,d 
+					dec a
+					dec a
+					dec a  ; odecteme 3 protoze HDD jednotky zacinaji az od 3
+; A je cislo jednotky uz od nuly napr. 1 (odpovida jednotce @4)
+					
+					ld l,a
+					ld h,0
+					ld d,h
+					add hl,hl
+					add hl,hl
+					add hl,hl
+					add hl,hl
+; A je vynasobeno 16 a ulozeno do HL (16*256=4096 LBA sertoru= 2MB na jednotku)
+		
+					ld a,(TAB_DRV+6)
+					ld e,a
+; vytahneme z VDT vyssi byte adresy	prvniho sectoru prvni jednotky, mel by to byt zaroven prvni sector prvniho souboru na HDD
+				
+					add hl,de
+; pricteme k L					
+					ld a,(TAB_DRV+5)
+					ld e,a
+; vytahneme z VDT nizsi byte adresy					
+					
+					ld d,l
+					ld l,h
+					ld h,0
+; spravne usporadame pro LBA24 (registry lde)					
+         ld   (LOW24+1),de
+         ld   (HIG24+1),hl
+
+         ld   a,e
+         or   d
+         or   l
+; jeste test jestli lde<>0, je v podstate zbytecny, ale musi byt nz         
+         ret
+	
+; ted to same pro slave										
+slave			ld hl,TAB_DRV+(VDTLEN/2)								
+					ld a,(hl)
+					or a
+					ret z ; slave disk neexistuje
+					
+					ld a,%11110000
+					ld (HEA_RD1+1),a
+					ld (HEA_WR1+1),a ; nastaveni slave
+					
+					ld a,(TAB_DRV+4+(VDTLEN/2))
+					ld (WR_PROT+1),a ; nastaveni WriteProtect 
+					
+          res 7,d ; slave nutno zrusit bit 7					
+					ld  a,d
+					dec a
+					dec a
+					dec a  ; odecteme 3 protoze HDD jednotky zacinaji az od 3
+; A je cislo jednotky uz od nuly napr. 1 (odpovida jednotce @4)
+					
+					ld l,a
+					ld h,0
+					ld d,h
+					add hl,hl
+					add hl,hl
+					add hl,hl
+					add hl,hl
+; A je vynasobeno 16 a ulozeno do HL (16*256=4096 LBA sertoru= 2MB na jednotku)
+		
+					ld a,(TAB_DRV+6+(VDTLEN/2))
+					ld e,a
+; vytahneme z VDT vyssi byte adresy	prvniho sectoru prvni jednotky, mel by to byt zaroven prvni sector prvniho souboru na HDD
+				
+					add hl,de
+; pricteme k L					
+					ld a,(TAB_DRV+5+(VDTLEN/2))
+					ld e,a
+; vytahneme z VDT nizsi byte adresy					
+					
+					ld d,l
+					ld l,h
+					ld h,0
+; spravne usporadame pro LBA24 (registry lde)					
+         ld   (LOW24+1),de
+         ld   (HIG24+1),hl
+
+         ld   a,e
+         or   d
+         or   l
+; jeste test jestli lde<>0, je v podstate zbytecny, ale musi byt nz         
+         ret
+					
+
+LEN      equ  $-144
+
+END1      equ  $-KKK+SEM1
+
+					ent
+include GUI.a80
+endfile
+patchLEN    equ  $-32768
+
+savesna "EasyHDD.sna",32768
+
+end

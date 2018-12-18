@@ -1,6 +1,16 @@
 ;LMN Patch (EasyHDD) build on Dron's HDDpatch 1.62
 ;public version for GIT
 
+;verze 2.01
+;- deaktivace zapisu na port #OF kvuli kolizi s SounDrive
+;- update 8BC logo
+;verze 2.00
+;- only for MB03+ Ultimate
+;- deaktivace cteni portu #0F (FDC statusu)
+;verze 1.06
+;- oprava aplikace zmeny DMA portu, navesti se projevilo jen GUI a ne v rutinach prenosu patche
+;- kosmeticke upravy zdrojoveho kodu
+;- zmena barvy copyright na fialovou
 ;verze 1.05
 ;- nova DMA sekvence umoznujici pouziti i originalniho Z80-DMA chipu
 ;- oprava chyby ve zvukovem efektu
@@ -51,10 +61,10 @@
 @autoinstall				db 0	;auto install (/wait for any key)
 @autoconfig					db 1	;auto configure (automatic search for first sector & set hdd parameters to VDT)
 @showsplash					db 1	;show splash screen
-@playnoise					db 1  ;playnoise
-										db 1  ;show gui
+@playnoise					db 1  	;playnoise
+							db 1	;show gui
 @noverify 					db 0	;disable write verify
-@dmar3							db 1	;install dma patch (oprava hodnoty dma registru R3)
+@dmar3						db 1	;install dma patch (oprava hodnoty dma registru R3)
 ;master disk
 VDT	      db 32,16 ;Sectors/Heads
 					dw 980;Cylinders
@@ -109,7 +119,21 @@ INSTALL  di
 
          ld   a,97
          out  (23),a
-
+; ███████████████ MB03+ only ███████████████████████████████████████
+		; by BusySoft
+		; disable cteni portu #0F pro vyblokovani detekce WP z FDC
+		; nahrada instrukce in a,(#0F) za ld a,0
+		ld hl, #020E 	;adresa v bsdosram
+		ld (hl),62		;ld a,
+		inc hl
+		ld (hl),0		;0
+		; disable sending data to fdc port #0F
+		; prepsani instrukce out(#0F),a dvema nopy
+		ld hl,0
+		ld (#019F),hl
+		ld (#0233),hl
+; ███████████████ end - MB03+ only ███████████████████████████████████████		
+		
          ld   hl,ADR20
          ld   de,20
          ld   bc,12
@@ -825,7 +849,8 @@ RD_512
          ld   (DMA_ADR1),hl
          push hl
          ld   hl,DMA_IN
-         ld   bc,14*256+11
+;        ld   bc,14*256+DMA
+		 ld   bc,((DMA_INEND-DMA_IN)*256)+DMA
          otir
          ld   a,97
          ld   b,#87
@@ -836,49 +861,25 @@ RD_512
          add  hl,bc
          ret
 
-DMA_IN   db 195
-; reset
-
-;        db #C7
-; reset PA timing
-;        db #CB
-; reset PB timing
-; !!! to je zbytecne -> reset
-
-         db %01111101
-         dw P_DAT
-         dw 511
-; transfer,PA->PB
-; start adr
-; block length
-         db %00101100
-; PA is IO,fixed
-         db %00010000
-; PB is memory,inc
-
-
-;        db %11000100
-; ?
-
-
-         db %10101101
-DMA_ADR1 dw 0
-; continuous
-; starting address
-         db %10010010
-; stop on end,/CE/WAIT,Ready lo
-         db #CF
-; load
-         db #B3
-; force ready
-
+DMA_IN   db 195				;WR6-reset
+         db %01111101		;WR0 A->B, transfer
+         dw P_DAT			;source port
+         dw 511				;lenght
+         db %00101100		;WR1 A-port,A-fixed
+         db %00010000		;WR2 B-memory, B-increment
+         db %10101101		;WR4 continuous,
+DMA_ADR1 dw 0				;destination
+         db %10010010		;WR5 ready low,CE/WAIT,stop on end of block
+         db #CF				;WR6 load
+         db #B3				;WR6 force ready
+DMA_INEND
 ;-------------
 
 WR_512
          ld   (DMA_ADR2),hl
          push hl
          ld   hl,DMA_OUT
-         ld   bc,((DMA_OUTEND-DMA_OUT)*256)+11
+         ld   bc,((DMA_OUTEND-DMA_OUT)*256)+DMA
          ld   a,97
          otir
          ld   a,97
@@ -890,8 +891,8 @@ WR_512
          ret
 ; nova sekvence o pro DMAOUT kompatibilni s orig. Z80DMA         
 DMA_OUT
-				 db #C3       ;WR6-reset
-				 db %00000001 ;WR0-Temporarily declare Port B as source in WR0 (bit 2 = 0)
+		 db #C3       ;WR6-reset
+		 db %00000001 ;WR0-Temporarily declare Port B as source in WR0 (bit 2 = 0)
          db %00010100 ;WR1-PA memory,increment
          db %00101000 ;WR2-PB io, fixed
          db %10000000 ;WR3

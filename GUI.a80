@@ -76,7 +76,7 @@ gui       di
          ldir
 */         
          ld   hl,TEXT2
-         ld   bc,#0a0e
+         ld   bc,#0a0d
          call T42_TEXT
          ld a,3
          ld b,128
@@ -96,7 +96,7 @@ nosplash
          ld   bc,#020a
          call T42_TEXT
          ld   hl,TEXT2
-         ld   bc,#030e
+         ld   bc,#030d
          call T42_TEXT
 ;carymary         
          ld bc,#0E3b
@@ -782,8 +782,8 @@ LER2
 ; navrat  
 
 ;------------------------------
-TEXT1    dc 16,70,"EasyHDD 1.05 for MB02+"
-TEXT2    dc 16,2,127," LMNof8BC 2006"
+TEXT1    dc 16,70,"EasyHDD 2.01 for MB03+"
+TEXT2    dc 16,3,127," LMN128/8BC 2018"
 TEXT3    dc 16,70,"MASTER DISK:"
 TEXT4    dc 16,70,"Model:"
 TEXT5    dc 16,70,"Firmware:"
@@ -801,6 +801,7 @@ TEXT14   dc 16,66,"Drive not ready"
 TEXT15   dc 16,66,"Other error    "
 TEXT16   db 16,69,"OK             "
          dc "     "
+/*
 TEXT17   db "Read errors:   "
          dc "    "
 TEXT18   db "Write errors:  "
@@ -819,11 +820,13 @@ TEXT23   db "Cloning complet"
          dc "ed"
 TEXT24   dc "1. COUNTDOWN"
 TEXT25   dc "2. COUNTUP"
+*/
 TEXT_YES dc 16,69,"Yes"
 TEXT_NO  dc 16,69,"No"
 TEXT_CLR db "               "
          db "               "
          dc "         "
+		 
 TEXT100  dc 16,67,"Press any key to install"
 TEXT101  dc 16,70,"C/H/S:"
 TEXT102  db 16,70,"Capacity: "
@@ -1869,14 +1872,14 @@ RD_512
          ld   hl,RD1S
          ld   bc,RD1L*256+DMA
 RDWR1    otir
-         ld   b,#87
+         ld   b,#87				;WR6 enable dma
          out  (c),b
          pop  hl
          ld   bc,512
          add  hl,bc
          ret
 ;------------------------------
-WR_512
+WR_512							;not use
          ld   (DMADR2),ix
          push hl
          ld   hl,WR1S
@@ -1885,17 +1888,17 @@ WR_512
 
 ;---<DMA_IN>-------------------
 RD1S
-         defb 195
-         defb %01111101
-         defw P_DAT
-         defw 511
-         defb %00101100
-         defb %00010000
-         defb %10101101
-DMADR1   defw 0
-         defb %10010010
-         defb #CF
-         defb #B3
+         defb 195				;WR6 #C3 reset
+         defb %01111101			;WR0 A->B, transfer
+         defw P_DAT				;source port
+         defw 511				;lenght
+         defb %00101100			;WR1 A-port,A-fixed
+         defb %00010000			;WR2 B-memory, B-increment
+         defb %10101101			;WR4 continuous,
+DMADR1   defw 0					;destination
+         defb %10010010			;WR5 ready low,CE/WAIT,stop on end of block
+         defb #CF				;WR6 load
+         defb #B3				;WR6 force ready
 RD1L     equ  $-RD1S
 ;---<DMA_OUT>------------------
 

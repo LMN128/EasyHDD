@@ -439,6 +439,7 @@ LER1
 
 ;SLAVE IDENTIFY
 Slaveinentify
+/* ;vyruseni SLAVE
 
          ld   hl,TEXT8
          ld   bc,#0D02
@@ -728,7 +729,6 @@ ctyrikrat2
          
 nemenfirstdatasectorm2       
 
-
 /*
 ;LBA Total sectors
 
@@ -747,31 +747,22 @@ nemenfirstdatasectorm2
          ld   bc,#1118
          call NUMBER4
 */
+
+*/ ;vyruseni SLAVE
+
+         ld   hl,TEXT17
+         ld   bc,#0E02
+         call T42_TEXT
+         ld   hl,TEXT18
+         ld   bc,#0F03
+         call T42_TEXT
+         ld   hl,TEXT19
+         ld   bc,#1003
+         call T42_TEXT		 
+
 Endinentify
-/*
-         ld   hl,TEXT16
-LER2
-         ld   bc,#0C0E
-         call T42_TEXT
-
-         pop  af
-         ld   h,0
-         ld   l,a
-         ld   bc,#0C26
-         call NUMBER2
-         
-*/      
-/* 
-;cloning
-        ld   hl,TEXT20
-         ld   bc,#1201
-         call T42_TEXT
-
-         ld   hl,TEXT20
-         ld   bc,#0401
-         call T42_TEXT
-*/ 					
- 				 ld   hl,TEXT100
+				
+		 ld   hl,TEXT100
          ld   bc,#1608
          call T42_TEXT
          
@@ -782,8 +773,8 @@ LER2
 ; navrat  
 
 ;------------------------------
-TEXT1    dc 16,70,"EasyHDD 2.01 for MB03+"
-TEXT2    dc 16,3,127," LMN128/8BC 2018"
+TEXT1    dc 16,70,"EasyHDD 2.03 for MB03+"
+TEXT2    dc 16,3,127," LMN128/8BC 2019"
 TEXT3    dc 16,70,"MASTER DISK:"
 TEXT4    dc 16,70,"Model:"
 TEXT5    dc 16,70,"Firmware:"
@@ -801,6 +792,13 @@ TEXT14   dc 16,66,"Drive not ready"
 TEXT15   dc 16,66,"Other error    "
 TEXT16   db 16,69,"OK             "
          dc "     "
+TEXT17	 dc 16,70,"DMA Speed:"
+TEXT18	 db 16,70,"Port: "
+		 db 16,69
+		 dc "2T"
+TEXT19	 db 16,70,"Memory: "	
+		 db 16,69
+		 dc "3T"		 
 /*
 TEXT17   db "Read errors:   "
          dc "    "

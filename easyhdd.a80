@@ -1,8 +1,14 @@
 ;LMN Patch (EasyHDD) build on Dron's HDDpatch 1.62
 ;public version for GIT
 
+;verze 2.03
+;-porty HOOD
+;verze 2.02
+;- zruseni detekce slave
+;- vypis rychlosti DMA prenosu
+;- zmena rychlosti DMA na 3T memory a 2T port
 ;verze 2.01
-;- deaktivace zapisu na port #OF kvuli kolizi s SounDrive
+;- deaktivace zapisu na port #0F kvuli kolizi s SounDrive
 ;- update 8BC logo
 ;verze 2.00
 ;- only for MB03+ Ultimate
@@ -78,6 +84,16 @@ VDT	      db 32,16 ;Sectors/Heads
 
 VDTLEN		equ $-VDT
 
+;porty HOOD
+P_DAT 	equ 195	;8'b110xx011
+P_ERR 	equ 167	;8'b101xx111
+P_HSE 	equ 203	;8'b110xx011
+P_NSE 	equ 175	;8'b101xx111
+P_CYL 	equ 211	;8'b110xx011
+P_CYH 	equ 183	;8'b101xx111
+P_HEA 	equ 219	;8'b110xx011
+P_COM 	equ 191 ;8'b101xx111
+/*
 ;porty hdd interface DRON		 
 P_DAT    equ 195
 P_ERR    equ 199
@@ -88,7 +104,7 @@ P_CYH    equ 215
 P_HEA    equ 219
 P_COM    equ 223
 
-/*
+
 ;porty hdd interface PVL
 P_DAT    equ 163
 P_ERR    equ 167
@@ -865,8 +881,15 @@ DMA_IN   db 195				;WR6-reset
          db %01111101		;WR0 A->B, transfer
          dw P_DAT			;source port
          dw 511				;lenght
-         db %00101100		;WR1 A-port,A-fixed
-         db %00010000		;WR2 B-memory, B-increment
+
+//         db %00101100		;WR1 A-port,A-fixed
+         db %01101100		;WR1 A-port,A-fixed,variable cycle
+		 db %11001110 		;2T no early cycle ends 
+		 
+         db %00010000		;WR2 B-memory, B-increment - standard cycle
+//         db %01010000		;WR2 B-memory, B-increment,variable cycle
+//		 db %11001110 		;2T no early cycle ends 
+
          db %10101101		;WR4 continuous,
 DMA_ADR1 dw 0				;destination
          db %10010010		;WR5 ready low,CE/WAIT,stop on end of block
@@ -893,13 +916,20 @@ WR_512
 DMA_OUT
 		 db #C3       ;WR6-reset
 		 db %00000001 ;WR0-Temporarily declare Port B as source in WR0 (bit 2 = 0)
-         db %00010100 ;WR1-PA memory,increment
-         db %00101000 ;WR2-PB io, fixed
+
+         db %00010100 ;WR1-PA memory,increment, - standard cycle
+//		 db %01010100 ;WR1-PA memory,increment,variable cycle
+//		 db %11001110 ;2T no early cycle ends 	
+
+//         db %00101000 ;WR2-PB io, fixed,
+		 db %01101000 ;WR2-PB io, fixed, variable cycle 	
+		 db %11001110 ;2T no early cycle ends
+		 
          db %10000000 ;WR3
          db %10101101 ;WR4-Write Port B (fixed destination) address to WR4.
          dw P_DAT
          db #CF       ;WR6-load
-         db %01111101 ;WR0-transfer,portA,block length
+         db %01111101 ;WR0-transfer,portAtoB,block length
 DMA_ADR2 dw 0
          dw 511
          db %10010010 ;WR5-stop on end,/CE/WAIT,Ready low

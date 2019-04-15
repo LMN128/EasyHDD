@@ -1,6 +1,8 @@
 ;LMN Patch (EasyHDD) build on Dron's HDDpatch 1.62
 ;public version for GIT
 
+;verze 2.04
+;-uprava pro jenom master, zato muzou byt jednotky 3-255
 ;verze 2.03
 ;-porty HOOD
 ;verze 2.02
@@ -976,17 +978,21 @@ DMA_ADR2 dw 0
 ; 3-127 master
 ; 131-255 slave
 ; 0,1,2,128,129,130 ret z a mozna a=0 jako nepouzite jednotky
+;;uprava pro pouziti na MB03+ kde je jenom master, zato muzou byt jednotky 3-255
 TST_DRV
 
 					ld d,a ; schovam a
 					inc a
-					jr z,slave ;@255 je OK a je slave
-					and %01111111
-					jr z,master ;@127 je OK
-					and %01111100
-					ret z ; test jednotek 0,1,2,128,129,130 ret z
-    			bit 7,d ;test master/slave
-					jr nz,slave
+;;					jr z,slave ;@255 je OK a je slave
+          jr z,master ;@255 je OK
+;;					and %01111111
+;;					jr z,master ;@127 je OK
+;;					and %01111100
+          and %11111100
+;;					ret z ; test jednotek 0,1,2,128,129,130 ret z
+          ret z ;; jednotky 0,1,2
+;;    			bit 7,d ;test master/slave
+;;					jr nz,slave
 master		ld hl,TAB_DRV
 					
 					ld a,(hl)

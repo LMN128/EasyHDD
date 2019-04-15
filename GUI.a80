@@ -320,16 +320,16 @@ L3       ld   bc,#091C
 ;prohledava se MBR, prvni partion, a hleda se v root dir. prvni datovy sector prvniho souboru
 ;prvni sektor disku je MBR:
 ;
-;na 1BEh zacinaji parametry prvni partition (10h každá)
-;na 08h až 0Bh je cislo relativniho sektoru zacatku partition (nebo na 01h až 03h ve formatu hlava/sektor/cylindr)
+;na 1BEh zacinaji parametry prvni partition (10h kaï¿½dï¿½)
+;na 08h aï¿½ 0Bh je cislo relativniho sektoru zacatku partition (nebo na 01h aï¿½ 03h ve formatu hlava/sektor/cylindr)
 ;
-;první sektor partition je BOOT a tam jsou tyto zajímavé údaje:
-;0Bh, 0Ch – pocet bytu na sektor
-;0Eh, 0Fh – pocet sektoru pred prvni FAT
-;10h – pocet FAT
-;11h, 12h – pocet polozek v ROOTu
-;16h, 17h – pocet sektoru ve FAT
-;první datový sektor je: zacatek_partition + sektoru_pred_FAT + sektoru_ve_FAT * pocet_FAT + polozek_v_ROOT * 20h / bytu_na_sektor
+;prvnï¿½ sektor partition je BOOT a tam jsou tyto zajï¿½mavï¿½ ï¿½daje:
+;0Bh, 0Ch ï¿½ pocet bytu na sektor
+;0Eh, 0Fh ï¿½ pocet sektoru pred prvni FAT
+;10h ï¿½ pocet FAT
+;11h, 12h ï¿½ pocet polozek v ROOTu
+;16h, 17h ï¿½ pocet sektoru ve FAT
+;prvnï¿½ datovï¿½ sektor je: zacatek_partition + sektoru_pred_FAT + sektoru_ve_FAT * pocet_FAT + polozek_v_ROOT * 20h / bytu_na_sektor
 
 					ld hl,TEXTPARSEC
 					ld bc,#0B02
@@ -642,16 +642,16 @@ L13      ld   bc,#111C
 ;prohledava se MBR, prvni partion, a hleda se v root dir. prvni datovy sector prvniho souboru
 ;prvni sektor disku je MBR:
 ;
-;na 1BEh zacinaji parametry prvni partition (10h každá)
-;na 08h až 0Bh je cislo relativniho sektoru zacatku partition (nebo na 01h až 03h ve formatu hlava/sektor/cylindr)
+;na 1BEh zacinaji parametry prvni partition (10h kaï¿½dï¿½)
+;na 08h aï¿½ 0Bh je cislo relativniho sektoru zacatku partition (nebo na 01h aï¿½ 03h ve formatu hlava/sektor/cylindr)
 ;
-;první sektor partition je BOOT a tam jsou tyto zajímavé údaje:
-;0Bh, 0Ch – pocet bytu na sektor
-;0Eh, 0Fh – pocet sektoru pred prvni FAT
-;10h – pocet FAT
-;11h, 12h – pocet polozek v ROOTu
-;16h, 17h – pocet sektoru ve FAT
-;první datový sektor je: zacatek_partition + sektoru_pred_FAT + sektoru_ve_FAT * pocet_FAT + polozek_v_ROOT * 20h / bytu_na_sektor
+;prvnï¿½ sektor partition je BOOT a tam jsou tyto zajï¿½mavï¿½ ï¿½daje:
+;0Bh, 0Ch ï¿½ pocet bytu na sektor
+;0Eh, 0Fh ï¿½ pocet sektoru pred prvni FAT
+;10h ï¿½ pocet FAT
+;11h, 12h ï¿½ pocet polozek v ROOTu
+;16h, 17h ï¿½ pocet sektoru ve FAT
+;prvnï¿½ datovï¿½ sektor je: zacatek_partition + sektoru_pred_FAT + sektoru_ve_FAT * pocet_FAT + polozek_v_ROOT * 20h / bytu_na_sektor
 
 					ld hl,TEXTPARSEC
 					ld bc,#1302
@@ -773,7 +773,7 @@ Endinentify
 ; navrat  
 
 ;------------------------------
-TEXT1    dc 16,70,"EasyHDD 2.03 for MB03+"
+TEXT1    dc 16,70,"EasyHDD 2.04 for MB03+"
 TEXT2    dc 16,3,127," LMN128/8BC 2019"
 TEXT3    dc 16,70,"MASTER DISK:"
 TEXT4    dc 16,70,"Model:"

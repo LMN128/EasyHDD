@@ -299,7 +299,7 @@ trikrat1
          djnz trikrat1				 
 ;delime tremi
          ld   bc,#0A1F         
-         call NUMBER3
+         call NUMBER4
          
          pop ix
          
@@ -344,9 +344,19 @@ L3       ld   bc,#091C
 ; dodelat osetreni erroru
          inc hx
          inc hx ; + 512
+;; novy kod je-li vubec MBR pritomen
+          ld de,0 ;;FAT boot sector zacina na LBA0, pokud neni MBR
+          ld a,(ix-66) ;;1BE
+          and 127 ;;80h or 00h MRB first partion table does exist
+          jr nz, MBRno 
+          ld a,(ix-64) ;;1C0
+          and a ;;pokud existuje patition, tak sector je nenulova
+          jr z, MBRno       
+MBRyes 
+;; end of novy kod je-li vubec MBR pritomen           
          ld   e,(ix-58) ; info o prvni partition zacina na #1BE
          ld   d,(ix-57)
-         ex   de,hl ; v hl je cislo sectoru kde zacina boot prvni par.
+MBRno    ex   de,hl ; v hl je cislo sectoru kde zacina boot prvni par.
          ld (bootsec+1),hl ; schovame cislo bootsectoru pro vypocet
          ld   bc,#0B10
          push hl
@@ -381,8 +391,52 @@ bootsec   ld hl,0
 					pop ix
 					pop de
 					add hl,de ; pricteme jen spodnich 16 bitu
+          ;; v HL je LBA Root Directory sectoru
           ld e,(ix+17); pocet polozek v ROOTu
 					ld d,(ix+18)
+;; novy kod pro vypocet prvniho datoveho sektoru s ohleden na souboru v rootu          
+          ld c,(ix+0dh) ;;pocet sectoru v clusteru, obvykle 64 (32KB cluster)
+          ld b,0
+          push de
+          push hl
+          push bc
+          ;;nacteni Root Directory sectoru
+          ld c,l
+          ld e,h
+          ld d,0
+          ld b,d
+          ld   ix,BUFFER
+          ld   a,%00000000 ;master
+          call LBAREAD
+
+          ld b,8 ;;prohledam prvnich 8 polozek, jestli zde neni mbd nebo mbh soubor, hledam jen priponu
+          ld de,32 ;; kazda polozka ma 32 bytes
+nextfile  ld a,(ix+08h)
+          cp "M"
+          jr nz, neplatne
+          ld a,(ix+09h)
+          cp "B"
+          jr nz, neplatne
+          ld a,(ix+0ah)
+          cp "H"
+          jr z, platne
+          cp "D"
+          jr z, platne
+neplatne  add ix,de
+          djnz nextfile
+          ld e,2 ;;pokud nenajdu pouziji cluster 0
+          jr 1F 
+platne    ld e,(ix+1ah)   ;;cluster na kterem zacina soubor       
+1F        ld d,0
+          dec de          ;;The clusters are numbered starting at 2, not 0! So the above calculation has to have 2 added to it to get the cluster number of a given allocation unit...and a cluster number is converted to an allocation unit number by subtracting 2...!
+          dec de
+          pop hl          ;;pocet sectoru v clusteru, obvykle 64 (32KB cluster)
+          call nasobeniHLDE.nasob ;; vysledek v IXHL
+          ex de,hl
+          pop hl          ;; v HL je LBA Root Directory sectoru
+          add hl,de       ;;
+          pop de         
+;; konec kodu pro vypocet prvniho datoveho sektoru s ohleden na souboru v rootu 
 					; vydelime 16; predpokladame velikost sec. 512 a 32bytu v root polozce
          ld b,4
 ctyrikrat1 
@@ -773,7 +827,7 @@ Endinentify
 ; navrat  
 
 ;------------------------------
-TEXT1    dc 16,70,"EasyHDD 2.04 for MB03+"
+TEXT1    dc 16,70,"EasyHDD 2.05 for MB03+"
 TEXT2    dc 16,3,127," LMN128/8BC 2019"
 TEXT3    dc 16,70,"MASTER DISK:"
 TEXT4    dc 16,70,"Model:"
@@ -828,7 +882,7 @@ TEXT_CLR db "               "
 TEXT100  dc 16,67,"Press any key to install"
 TEXT101  dc 16,70,"C/H/S:"
 TEXT102  db 16,70,"Capacity: "
-				 dc 16,69,"    MB"
+				 dc 16,69,"     MB"
 TEXTPARSEC db 16,70,"1st Par. Sec.:"
   					dc 16,69," "	 
  

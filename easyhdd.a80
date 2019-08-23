@@ -1,6 +1,11 @@
 ;LMN Patch (EasyHDD) build on Dron's HDDpatch 1.62
 ;public version for GIT
 
+;verze 2.05
+; vylepseni detekce prvniho datoveho souboru, nyni se prohledava root a vypocte datovy sektor podle prvniho nalezeneho souboru mbd nebo mbh
+; http://www.tavi.co.uk/phobos/fat.html
+; detekce zda-li se jedna o disk s MBR nebo bez
+; oprava vypisu kapacity velkych disku
 ;verze 2.04
 ;-uprava pro jenom master, zato muzou byt jednotky 3-255
 ;verze 2.03

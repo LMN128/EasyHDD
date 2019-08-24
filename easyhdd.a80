@@ -1,6 +1,8 @@
 ;LMN Patch (EasyHDD) build on Dron's HDDpatch 1.62
 ;public version for GIT
 
+;version 2.06
+; update ATA command, some was obsolete
 ;verze 2.05
 ; vylepseni detekce prvniho datoveho souboru, nyni se prohledava root a vypocte datovy sektor podle prvniho nalezeneho souboru mbd nebo mbh
 ; http://www.tavi.co.uk/phobos/fat.html
@@ -660,7 +662,8 @@ HEA_RD1  or   %11100000
          out  (P_CYH),a
 ;cislo cylindru
 
-         ld   a,#21
+        ld a,#20
+//         ld   a,#21     //LMN - #21 obsolete command
          out  (P_COM),a
 ;read with retries
 
@@ -708,8 +711,8 @@ HEA_WR1  or   %11100000
          ld   a,d
          out  (P_CYH),a
 ;cislo cylindru
-
-         ld   a,#31
+        ld a,#30
+//         ld   a,#31   //LMN - #31 obsolete command
          out  (P_COM),a
 ;write with retries
 

@@ -827,7 +827,7 @@ Endinentify
 ; navrat  
 
 ;------------------------------
-TEXT1    dc 16,70,"EasyHDD 2.05 for MB03+"
+TEXT1    dc 16,70,"EasyHDD 2.06 for MB03+"
 TEXT2    dc 16,3,127," LMN128/8BC 2019"
 TEXT3    dc 16,70,"MASTER DISK:"
 TEXT4    dc 16,70,"Model:"

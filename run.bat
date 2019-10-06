@@ -1,2 +1,2 @@
 sjasm easyhdd.a80 -ml
-easyhdd.sna
+"c:\Program Files (x86)\Spectaculator\Spectaculator.exe"  easyhdd.sna

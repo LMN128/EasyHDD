@@ -58,13 +58,13 @@ gui       di
          ld a,2
          call sprite2.SP_
          ld a,1
-         ld b,40
+         ld b,10 ;was 40
          call zvukplay
          
          ld   a,1
          call sprite2.SP_
          ld a,2
-         ld b,40
+         ld b,10 ;was 40
          call zvukplay
          xor a
          call sprite2.SP_
@@ -79,10 +79,10 @@ gui       di
          ld   bc,#0a0d
          call T42_TEXT
          ld a,3
-         ld b,128
+         ld b,100 ;was 128
          call zvukplay
          call zvukcompile+57 ;ticho
-         call ANYKEY
+ ;        call ANYKEY
          
 nosplash         
          call cls.CLS
@@ -827,7 +827,7 @@ Endinentify
 ; navrat  
 
 ;------------------------------
-TEXT1    dc 16,70,"EasyHDD 2.06 for MB03+"
+TEXT1    dc 16,70,"EasyHDD 2.07 for MB03+"
 TEXT2    dc 16,3,127," LMN128/8BC 2019"
 TEXT3    dc 16,70,"MASTER DISK:"
 TEXT4    dc 16,70,"Model:"

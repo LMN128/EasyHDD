@@ -1,6 +1,8 @@
 ;LMN Patch (EasyHDD) build on Dron's HDDpatch 1.62
 ;public version for GIT
-
+;version 2.07
+;change driver identification text "HddDrive" to "HddEH207"
+;change/speed up splash screen, removed anykey
 ;version 2.06
 ; update ATA command, some was obsolete
 ;verze 2.05
@@ -345,7 +347,7 @@ ADR16
          xor  a
          ld   de,65535
          jp   5
-         db "HddDrive"
+         db "HddEH207"
 
          ld   a,97
          out  (23),a

@@ -1,320 +1,310 @@
-
-include "nasobeniHLDE.a80"
-;include "draw.a80"
-include "draw-jugo.a80"
-include "cls.a80"
-;include "sprite1.a80"
-CaroLogo
-incbin "CaroLogo.bin"
-NewdimLogo
-incbin "NewdimLogo.bin"
-include "sprite2.a80"
-eightbc_i
-incbin "8BC_I.cde"
-EasyLogoSmall
-incbin "EasyLogoSmall.bin"
-;include "lbaread.a80" ; vlozeno primo do kodu GUI
-zvuk
-incbin "ZVUK.BIN"
+		include	"nasobeniHLDE.a80"
+;		include	"draw.a80"
+		include	"draw-jugo.a80"
+		include	"cls.a80"
+;		include	"sprite1.a80"
+CaroLogo	incbin	"CaroLogo.bin"
+NewdimLogo	incbin	"NewdimLogo.bin"
+		include	"sprite2.a80"
+eightbc_i	incbin	"8BC_I.cde"
+EasyLogoSmall	incbin	"EasyLogoSmall.bin"
+;		include "lbaread.a80"	;vlozeno primo do kodu GUI
+zvuk		incbin	"ZVUK.BIN"
 zvukend
 
-
-
 @SP_TAB
-@TAB_sprite1      DEFB 10,2
-         DEFW CaroLogo
-         DEFB 24,20
-         DEFW NewdimLogo
-         defb 0,21
-         defw eightbc_i
-         defb 1,2
-         defw eightbc_i
-         defb 25,2
-         defw EasyLogoSmall
+@TAB_sprite1	defb	10,2
+		defw	CaroLogo
+		defb	24,20
+		defw	NewdimLogo
+		defb	0,21
+		defw	eightbc_i
+		defb	1,2
+		defw	eightbc_i
+		defb	25,2
+		defw	EasyLogoSmall
 
-         
-module GUI
 
-zvukcompile				equ 60000 ; adresa zkopilovaneho zvuku 
+	module	GUI
 
-gui       di
-;         xor a
-;         out  (254),a
+zvukcmp equ	60000		;adresa zkopilovaneho zvuku
+
+gui	di
+;	xor	a
+;	out	(254),a
 
 ;splash screen
-					ld a,(@showsplash)
-					or a
-					jr z,nosplash
-					
-					ld hl,zvuk
-					ld de,zvukcompile
-					ld bc,zvukend-zvuk
-					ldir		
+	ld	a,(@showsplash)
+	or	a
+	jr	z,nosplash
+
+	ld	hl,zvuk
+	ld	de,zvukcmp
+	ld	bc,zvukend-zvuk
+	ldir
 ; presune zvuk na sve misto
 
-; init         					
-				 call cls.CLS
-				 		
-         ld a,2
-         call sprite2.SP_
-         ld a,1
-         ld b,10 ;was 40
-         call zvukplay
-         
-         ld   a,1
-         call sprite2.SP_
-         ld a,2
-         ld b,10 ;was 40
-         call zvukplay
-         xor a
-         call sprite2.SP_
-         
-/*         ld   hl,22528+256+32
-         ld   de,22529+256+32
-         ld   bc,255-32
-         ld   (hl),6
-         ldir
-*/         
-         ld   hl,TEXT2
-         ld   bc,#0a0d
-         call T42_TEXT
-         ld a,3
-         ld b,100 ;was 128
-         call zvukplay
-         call zvukcompile+57 ;ticho
- ;        call ANYKEY
-         
-nosplash         
-         call cls.CLS
-         call T_START
+; init
+	call	cls.CLS
+
+	ld	a,2
+	call	sprite2.SP_
+	ld	a,1
+	ld	b,10		;was 40
+	call	zvukplay
+
+	ld	a,1
+	call	sprite2.SP_
+	ld	a,2
+	ld	b,10		;was 40
+	call	zvukplay
+	xor	a
+	call	sprite2.SP_
+
+;/*	ld	hl,22528+256+32
+;	ld	de,22529+256+32
+;	ld	bc,255-32
+;	ld	(hl),6
+;	ldir
+;*/
+	ld	hl,TEXT2
+	ld	bc,#0a0d
+	call	T42_TEXT
+	ld	a,3
+	ld	b,100		;was 128
+	call	zvukplay
+	call	zvukcmp+57	;ticho
+;	call	ANYKEY
+
+nosplash
+	call	cls.CLS
+	call	T_START
 ; vykresli tabulku
-         ld   a,3
-         call sprite2.SP_
-         ld   a,4
-         call sprite2.SP_
-         ld   hl,TEXT1
-         ld   bc,#020a
-         call T42_TEXT
-         ld   hl,TEXT2
-         ld   bc,#030d
-         call T42_TEXT
-;carymary         
-         ld bc,#0E3b
-         ld de,#0EBF
-         call draw_jugo.DRAW
-         ld bc,#213b
-         ld de,#21BF
-         call draw_jugo.DRAW
-         ld bc,#0F3a
-         ld de,#203a
-         call draw_jugo.DRAW
-         ld bc,#0FC0
-         ld de,#20C0
-         call draw_jugo.DRAW
-         
-;
-;
+	ld	a,3
+	call	sprite2.SP_
+	ld	a,4
+	call	sprite2.SP_
+	ld	hl,TEXT1
+	ld	bc,#020a
+	call	T42_TEXT
+	ld	hl,TEXT2
+	ld	bc,#030d
+	call	T42_TEXT
+;carymary
+	ld	bc,#0E3b
+	ld	de,#0EBF
+	call	draw_jugo.DRAW
+	ld	bc,#213b
+	ld	de,#21BF
+	call	draw_jugo.DRAW
+	ld	bc,#0F3a
+	ld	de,#203a
+	call	draw_jugo.DRAW
+	ld	bc,#0FC0
+	ld	de,#20C0
+	call	draw_jugo.DRAW
+
 ;MASTER IDENTIFY
 
-         ld   hl,TEXT3
-         ld   bc,#0502
-         call T42_TEXT
+	ld	hl,TEXT3
+	ld	bc,#0502
+	call	T42_TEXT
 
-         ld   ix,BUFFER
-         ld   a,%00000000
-         call IDENTIFY       
-;          xor a ; testovaci
-         ld   hl,TEXT16
-         push af			
-         jr   z,TISKSTATUS1 ; OK
-         ld   hl,TEXT11
-         cp   255
-         jp   z,TISKSTATUS1
-         ld   hl,TEXT14
-         cp   6
-         jp   z,TISKSTATUS1
-         ld   hl,TEXT13
-         cp   3
-         jp   z,TISKSTATUS1
-         ld   hl,TEXT12
-         dec  a
-         jp   z,TISKSTATUS1
-         ld   hl,TEXT15
+	ld	ix,BUFFER
+	ld	a,%00000000
+	call	IDENTIFY
+;	xor	a		;testovaci
+	ld	hl,TEXT16
+	push	af
+	jr	z,TISKSTATUS1	;OK
+	ld	hl,TEXT11
+	cp	255
+	jp	z,TISKSTATUS1
+	ld	hl,TEXT14
+	cp	6
+	jp	z,TISKSTATUS1
+	ld	hl,TEXT13
+	cp	3
+	jp	z,TISKSTATUS1
+	ld	hl,TEXT12
+	dec	a
+	jp	z,TISKSTATUS1
+	ld	hl,TEXT15
 
-;        jp   LER1
-         
-TISKSTATUS1     ld   bc,#050F
-         call T42_TEXT
-         
-    		 pop  af
-         jr   z,MASTERINFO
-         
-         ld   h,0
-         ld   l,a
-         ld   bc,#0526
-         call NUMBER2
-;pokud je General setting nastavena autoconfigurace, tak pri neuspesnem detekovani zarizeni se do CHS ulozi nuly a HDD pak nasledne nebude nainstalovan         
-         ld a,(@autoconfig)
-         or a
-         jr z,nemenCHSm1
-         xor a
-         ld b,4
-         ld hl,VDT
-nulydoCHSm  ld (hl),a
-         inc hl
-         djnz nulydoCHSm
-nemenCHSm1 jp Slaveinentify
-				
+;	jp	LER1
+
+TISKSTATUS1
+	ld	bc,#050F
+	call	T42_TEXT
+
+	pop	af
+	jr	z,MASTERINFO
+
+	ld	h,0
+	ld	l,a
+	ld	bc,#0526
+	call	NUMBER2
+;pokud je General setting nastavena autoconfigurace, tak pri neuspesnem detekovani zarizeni se do CHS ulozi nuly a HDD pak nasledne nebude nainstalovan
+	ld	a,(@autoconfig)
+	or	a
+	jr	z,nemenCHSm1
+	xor	a
+	ld	b,4
+	ld	hl,VDT
+nulydoCHSm
+	ld	(hl),a
+	inc	hl
+	djnz	nulydoCHSm
+nemenCHSm1
+	jp	Slaveinentify
+
 MASTERINFO
-         ld   hl,TEXT4
-         ld   bc,#0602
-         call T42_TEXT
-         ld   hl,TEXT5
-         ld   bc,#0702
-         call T42_TEXT
-         ld   hl,TEXT6
-         ld   bc,#0802
-         call T42_TEXT
-         ld   hl,TEXT7
-         ld   bc,#0902
-         call T42_TEXT
-         ld   hl,TEXT101
-         ld   bc,#0A02
-         call T42_TEXT
-         ld   hl,TEXT102
-         ld   bc,#0A15
-         call T42_TEXT
+	ld	hl,TEXT4
+	ld	bc,#0602
+	call	T42_TEXT
+	ld	hl,TEXT5
+	ld	bc,#0702
+	call	T42_TEXT
+	ld	hl,TEXT6
+	ld	bc,#0802
+	call	T42_TEXT
+	ld	hl,TEXT7
+	ld	bc,#0902
+	call	T42_TEXT
+	ld	hl,TEXT101
+	ld	bc,#0A02
+	call	T42_TEXT
+	ld	hl,TEXT102
+	ld	bc,#0A15
+	call	T42_TEXT
 
 ;model
-         ld   hl,BUFFER+54
-         ld   b,40
-         call PROHOD
-         set  7,(ix+84)
+	ld	hl,BUFFER+54
+	ld	b,40
+	call	PROHOD
+	set	7,(ix+84)
 
-         ld   bc,#0609
-         call T42_TEXT
+	ld	bc,#0609
+	call	T42_TEXT
 
 ;firmware
-         ld   hl,BUFFER+46
-         ld   b,8
-         call PROHOD
-         set  7,(ix+53)
+	ld	hl,BUFFER+46
+	ld	b,8
+	call	PROHOD
+	set	7,(ix+53)
 
-         ld   bc,#070C
-         call T42_TEXT
+	ld	bc,#070C
+	call	T42_TEXT
 
 ;serial number
 
-         ld   hl,BUFFER+20
-         ld   b,20
-         call PROHOD
-         set  7,(ix+39)
+	ld	hl,BUFFER+20
+	ld	b,20
+	call	PROHOD
+	set	7,(ix+39)
 
-         ld   bc,#0811
-         call T42_TEXT
-         
+	ld	bc,#0811
+	call	T42_TEXT
 
-         
 ;LBA
-         ld   hl,TEXT_NO
-         bit  1,(ix+99)
-         jr   z,L1
+	ld	hl,TEXT_NO
+	bit	1,(ix+99)
+	jr	z,L1
 
-         ld   hl,TEXT_YES
-L1       ld   bc,#090D
-         call T42_TEXT
+	ld	hl,TEXT_YES
+L1	ld	bc,#090D
+	call	T42_TEXT
 
 ;DMA
-         ld   hl,TEXT_NO
-         bit  0,(ix+99)
-         jr   z,L2
+	ld	hl,TEXT_NO
+	bit	0,(ix+99)
+	jr	z,L2
 
-         ld   hl,TEXT_YES
-L2       ld   bc,#0925
-         call T42_TEXT
+	ld	hl,TEXT_YES
+L2	ld	bc,#0925
+	call	T42_TEXT
 
 ;CHS
 ;Cylinders
-				 ld l,(ix+2)
-				 ld h,(ix+3)
-         ld   bc,#0A09
-         call NUMBER4              
-;Heads         
-         ld l,(ix+6)
-				 ld h,(ix+7)
-         ld   bc,#0A0f
-         call NUMBER1
-;Sectors         
-         ld l,(ix+12)
-				 ld h,(ix+13)
-         ld   bc,#0A12
-         call NUMBER1
-;pokud je General setting nastavena autoconfigurace, tak pri uspesnem detekovani zarizeni se do CHS ulozi zjistene udaje         
-         
-         ld a,(@autoconfig)
-         or a
-         jr z,nemenCHSm2
-         ld hl,VDT
-         ld a,(ix+12)
-         ld (hl),a
-         ld a,(ix+6)
-         inc hl
-         ld (hl),a
-         ld a,(ix+2)
-         inc hl
-         ld (hl),a
-         ld a,(ix+3)
-         inc hl
-         ld (hl),a
-                           
-nemenCHSm2         
-;capacity                          
-				 ld l,(ix+12)
-				 ld h,(ix+13)
-         ld e,(ix+6)
-				 ld d,(ix+7)
-				
-				
-				 push ix ; rutina nasob pouziva IX
-         call nasobeniHLDE.nasob
-         pop ix
-         ld e,(ix+2)
-				 ld d,(ix+3)
-				 
-				 push ix
-         call nasobeniHLDE.nasob
+	ld	l,(ix+2)
+	ld	h,(ix+3)
+	ld	bc,#0A09
+	call	NUMBER4
+;Heads
+	ld	l,(ix+6)
+	ld	h,(ix+7)
+	ld	bc,#0A0f
+	call	NUMBER1
+;Sectors
+	ld	l,(ix+12)
+	ld	h,(ix+13)
+	ld	bc,#0A12
+	call	NUMBER1
+;pokud je General setting nastavena autoconfigurace, tak pri uspesnem detekovani zarizeni se do CHS ulozi zjistene udaje
+
+	ld	a,(@autoconfig)
+	or	a
+	jr	z,nemenCHSm2
+	ld	hl,VDT
+	ld	a,(ix+12)
+	ld	(hl),a
+	ld	a,(ix+6)
+	inc	hl
+	ld	(hl),a
+	ld	a,(ix+2)
+	inc	hl
+	ld	(hl),a
+	ld	a,(ix+3)
+	inc	hl
+	ld	(hl),a
+
+nemenCHSm2
+;capacity
+	ld	l,(ix+12)
+	ld	h,(ix+13)
+	ld	e,(ix+6)
+	ld	d,(ix+7)
+
+
+	push	ix		;rutina nasob pouziva IX
+	call	nasobeniHLDE.nasob
+	pop	ix
+	ld	e,(ix+2)
+	ld	d,(ix+3)
+
+	push	ix
+	call	nasobeniHLDE.nasob
 ;vysledek je v IXHL
 
-				 ld l,h
-				 ld a,xl
-				 ld h,a
-				 ld e,hx
+	ld	l,h
+	ld	a,xl
+	ld	h,a
+	ld	e,hx
 
 ;delime 256 vysledek EHL
-         ld b,3
+	ld	b,3
 trikrat1 
-         srl e
-         rr h
-         rr l
-         djnz trikrat1				 
+	srl	e
+	rr	h
+	rr	l
+	djnz	trikrat1
 ;delime tremi
-         ld   bc,#0A1F         
-         call NUMBER4
-         
-         pop ix
-         
-         
+	ld	bc,#0A1F
+	call	NUMBER4
+
+	pop	ix
+
 ;LBA 48Bits
 
-         inc  hx
+	inc	hx
 
-         ld   hl,TEXT_NO
-         bit  2,(ix-83)
-         jr   z,L3
+	ld	hl,TEXT_NO
+	bit	2,(ix-83)
+	jr	z,L3
 
-         ld   hl,TEXT_YES
-L3       ld   bc,#091C
-         call T42_TEXT
+	ld	hl,TEXT_YES
+L3	ld	bc,#091C
+	call	T42_TEXT
 ;
 ;hledani prvni sectoru pro data
 ;prohledava se MBR, prvni partion, a hleda se v root dir. prvni datovy sector prvniho souboru
@@ -331,366 +321,369 @@ L3       ld   bc,#091C
 ;16h, 17h � pocet sektoru ve FAT
 ;prvn� datov� sektor je: zacatek_partition + sektoru_pred_FAT + sektoru_ve_FAT * pocet_FAT + polozek_v_ROOT * 20h / bytu_na_sektor
 
-					ld hl,TEXTPARSEC
-					ld bc,#0B02
-          call T42_TEXT
+	ld	hl,TEXTPARSEC
+	ld	bc,#0B02
+	call	T42_TEXT
  
-;nacteni MBR         
-         ld   ix,BUFFER
-         ld   a,%00000000 ;master
-         ld   bc,0
-         ld   de,0 ; LBA=0 MBR
-         call LBAREAD  
+;nacteni MBR
+	ld	ix,BUFFER
+	ld	a,%00000000	;master
+	ld	bc,0
+	ld	de,0		;LBA=0 MBR
+	call	LBAREAD
 ; dodelat osetreni erroru
-         inc hx
-         inc hx ; + 512
+	inc	hx
+	inc	hx		;+512
 ;; novy kod je-li vubec MBR pritomen
-          ld de,0 ;;FAT boot sector zacina na LBA0, pokud neni MBR
-          ld a,(ix-66) ;;1BE
-          and 127 ;;80h or 00h MRB first partion table does exist
-          jr nz, MBRno 
-          ld a,(ix-64) ;;1C0
-          and a ;;pokud existuje patition, tak sector je nenulova
-          jr z, MBRno       
+	ld	de,0		;;FAT boot sector zacina na LBA0, pokud neni MBR
+	ld	a,(ix-66)	;;1BE
+	and	127		;;80h or 00h MRB first partion table does exist
+	jr	nz, MBRno
+	ld	a,(ix-64)	;;1C0
+	and	a		;;pokud existuje patition, tak sector je nenulova
+	jr	z, MBRno
 MBRyes 
-;; end of novy kod je-li vubec MBR pritomen           
-         ld   e,(ix-58) ; info o prvni partition zacina na #1BE
-         ld   d,(ix-57)
-MBRno    ex   de,hl ; v hl je cislo sectoru kde zacina boot prvni par.
-         ld (bootsec+1),hl ; schovame cislo bootsectoru pro vypocet
-         ld   bc,#0B10
-         push hl
-         call NUMBER3
+;; end of novy kod je-li vubec MBR pritomen
+	ld	e,(ix-58)	;info o prvni partition zacina na #1BE
+	ld	d,(ix-57)
+MBRno	ex	de,hl		;v hl je cislo sectoru kde zacina boot prvni par.
+	ld	(bootsec+1),hl	;schovame cislo bootsectoru pro vypocet
+	ld	bc,#0B10
+	push	hl
+	call	NUMBER3
 ;nacteni BOOT sectoru prvni partition
-         pop hl
-         ld c,l
-         ld e,h
-         ld d,0
-         ld b,d
-         ld   ix,BUFFER
-         ld   a,%00000000 ;master
-         call LBAREAD
+	pop	hl
+	ld	c,l
+	ld	e,h
+	ld	d,0
+	ld	b,d
+	ld	ix,BUFFER
+	ld	a,%00000000 ;master
+	call	LBAREAD
 ; dodelat osetreni erroru
 ; vypocet datove oblasti prvniho souboru
-					
-					ld hl,TEXTDATASEC
-					ld bc,#0B15
-          call T42_TEXT
 
-bootsec   ld hl,0
-					ld e,(ix+14); pricteme sectory pred FAT
-					ld d,(ix+15)
-					add hl,de
-					push hl
-					push ix
-					ld e,(ix+16); pocet FAT
-					ld d,0
-					ld l,(ix+22); pocet sektoru ve FAT
-					ld h,(ix+23)
-          call nasobeniHLDE.nasob ; vysledek v IXHL
-					pop ix
-					pop de
-					add hl,de ; pricteme jen spodnich 16 bitu
-          ;; v HL je LBA Root Directory sectoru
-          ld e,(ix+17); pocet polozek v ROOTu
-					ld d,(ix+18)
-;; novy kod pro vypocet prvniho datoveho sektoru s ohleden na souboru v rootu          
-          ld c,(ix+0dh) ;;pocet sectoru v clusteru, obvykle 64 (32KB cluster)
-          ld b,0
-          push de
-          push hl
-          push bc
-          ;;nacteni Root Directory sectoru
-          ld c,l
-          ld e,h
-          ld d,0
-          ld b,d
-          ld   ix,BUFFER
-          ld   a,%00000000 ;master
-          call LBAREAD
+	ld	hl,TEXTDATASEC
+	ld	bc,#0B15
+	call	T42_TEXT
 
-          ld b,8 ;;prohledam prvnich 8 polozek, jestli zde neni mbd nebo mbh soubor, hledam jen priponu
-          ld de,32 ;; kazda polozka ma 32 bytes
-nextfile  ld a,(ix+08h)
-          cp "M"
-          jr nz, neplatne
-          ld a,(ix+09h)
-          cp "B"
-          jr nz, neplatne
-          ld a,(ix+0ah)
-          cp "H"
-          jr z, platne
-          cp "D"
-          jr z, platne
-neplatne  add ix,de
-          djnz nextfile
-          ld e,2 ;;pokud nenajdu pouziji cluster 0
-          jr 1F 
-platne    ld e,(ix+1ah)   ;;cluster na kterem zacina soubor       
-1F        ld d,0
-          dec de          ;;The clusters are numbered starting at 2, not 0! So the above calculation has to have 2 added to it to get the cluster number of a given allocation unit...and a cluster number is converted to an allocation unit number by subtracting 2...!
-          dec de
-          pop hl          ;;pocet sectoru v clusteru, obvykle 64 (32KB cluster)
-          call nasobeniHLDE.nasob ;; vysledek v IXHL
-          ex de,hl
-          pop hl          ;; v HL je LBA Root Directory sectoru
-          add hl,de       ;;
-          pop de         
+bootsec	ld	hl,0
+	ld	e,(ix+14)	;pricteme sectory pred FAT
+	ld	d,(ix+15)
+	add	hl,de
+	push	hl
+	push	ix
+	ld	e,(ix+16)	;pocet FAT
+	ld	d,0
+	ld	l,(ix+22)	;pocet sektoru ve FAT
+	ld	h,(ix+23)
+	call	nasobeniHLDE.nasob	;vysledek v IXHL
+	pop	ix
+	pop	de
+	add	hl,de		;pricteme jen spodnich 16 bitu
+	;; v HL je LBA Root Directory sectoru
+	ld	e,(ix+17)	;pocet polozek v ROOTu
+	ld	d,(ix+18)
+;; novy kod pro vypocet prvniho datoveho sektoru s ohleden na souboru v rootu
+	ld	c,(ix+0dh)	;;pocet sectoru v clusteru, obvykle 64 (32KB cluster)
+	ld	b,0
+	push	de
+	push	hl
+	push	bc
+	;;nacteni Root Directory sectoru
+	ld	c,l
+	ld	e,h
+	ld	d,0
+	ld	b,d
+	ld	ix,BUFFER
+	ld	a,%00000000	;master
+	call	LBAREAD
+
+	ld	b,8		;;prohledam prvnich 8 polozek, jestli zde neni mbd nebo mbh soubor, hledam jen priponu
+	ld	de,32		;; kazda polozka ma 32 bytes
+nextfile
+	ld	a,(ix+08h)
+	cp	"M"
+	jr	nz, neplatne
+	ld	a,(ix+09h)
+	cp	"B"
+	jr	nz, neplatne
+	ld	a,(ix+0ah)
+	cp	"H"
+	jr	z, platne
+	cp	"D"
+	jr	z, platne
+neplatne
+	add	ix,de
+	djnz	nextfile
+	ld	e,2		;;pokud nenajdu pouziji cluster 0
+	jr	l1F
+platne	ld	e,(ix+1ah)	;;cluster na kterem zacina soubor
+l1F	ld	d,0
+	dec	de		;;The clusters are numbered starting at 2, not 0! So the above calculation has to have 2 added to it to get the cluster number of a given allocation unit...and a cluster number is converted to an allocation unit number by subtracting 2...!
+	dec	de
+	pop	hl		;;pocet sectoru v clusteru, obvykle 64 (32KB cluster)
+	call	nasobeniHLDE.nasob	;; vysledek v IXHL
+	ex	de,hl
+	pop	hl		;; v HL je LBA Root Directory sectoru
+	add	hl,de
+	pop	de
 ;; konec kodu pro vypocet prvniho datoveho sektoru s ohleden na souboru v rootu 
-					; vydelime 16; predpokladame velikost sec. 512 a 32bytu v root polozce
-         ld b,4
+	; vydelime 16; predpokladame velikost sec. 512 a 32bytu v root polozce
+	ld	b,4
 ctyrikrat1 
-         srl d
-         rr e
-         djnz ctyrikrat1
-				 add hl,de
-				 push hl  
-         ld   bc,#0B23
-         call NUMBER4
-         pop hl
-;pokud je General setting nastavena autoconfigurace, tak ulozi vypocteny prvni datovy sector         
-         
-         ld a,(@autoconfig)
-         or a
-         jr z,nemenfirstdatasectorm1
-         ld de,VDT+5
-         ex de,hl
-         ld (hl),e
-         inc hl
-         ld (hl),d
-         
-nemenfirstdatasectorm1       
-/*
+	srl	d
+	rr	e
+	djnz	ctyrikrat1
+	add	hl,de
+	push	hl
+	ld	bc,#0B23
+	call	NUMBER4
+	pop	hl
+;pokud je General setting nastavena autoconfigurace, tak ulozi vypocteny prvni datovy sector
+
+	ld	a,(@autoconfig)
+	or	a
+	jr	z,nemenfirstdatasectorm1
+	ld	de,VDT+5
+	ex	de,hl
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+
+nemenfirstdatasectorm1
+;/*
 ;LBA Total sectors
-
-         ld   hl,(BUFFER+200)
-         ld   (D1LBA),hl
-         ld   bc,#0A24
-         call NUMBER4
-
-         ld   hl,(BUFFER+202)
-         ld   (D1LBA+2),hl
-         ld   bc,#0A1E
-         call NUMBER4
-
-         ld   hl,(BUFFER+204)
-         ld   (D1LBA+4),hl
-         ld   bc,#0A18
-         call NUMBER4
-
-
-         ld   hl,TEXT16
-LER1
-         ld   bc,#050F
-         call T42_TEXT
-
-         pop  af
-         ld   h,0
-         ld   l,a
-         ld   bc,#0524
-         call NUMBER4
-*/
-
+;
+;	ld	hl,(BUFFER+200)
+;	ld	(D1LBA),hl
+;	ld	bc,#0A24
+;	call	NUMBER4
+;
+;	ld	hl,(BUFFER+202)
+;	ld	(D1LBA+2),hl
+;	ld	bc,#0A1E
+;	call	NUMBER4
+;
+;	ld	hl,(BUFFER+204)
+;	ld	(D1LBA+4),hl
+;	ld	bc,#0A18
+;	call	NUMBER4
+;
+;
+;	ld	hl,TEXT16
+;LER1
+;	ld	bc,#050F
+;	call	T42_TEXT
+;
+;	pop	af
+;	ld	h,0
+;	ld	l,a
+;	ld	bc,#0524
+;	call	NUMBER4
+;*/
+;
 ;SLAVE IDENTIFY
 Slaveinentify
-/* ;vyruseni SLAVE
-
-         ld   hl,TEXT8
-         ld   bc,#0D02
-         call T42_TEXT
-
-
-         ld   ix,BUFFER
-         ld   a,%00010000
-         call IDENTIFY
-         
-         ld   hl,TEXT16
-         push af
-         jr   z,TISKSTATUS2
-         ld   hl,TEXT11
-         cp   255
-         jp   z,TISKSTATUS2
-         ld   hl,TEXT14
-         cp   6
-         jp   z,TISKSTATUS2
-         ld   hl,TEXT13
-         cp   3
-         jp   z,TISKSTATUS2
-         ld   hl,TEXT12
-         dec  a
-         jp   z,TISKSTATUS2
-         ld   hl,TEXT15
-
-TISKSTATUS2     ld   bc,#0D0F
-         call T42_TEXT
-         
-    		 pop  af
-         jr   z,SLAVEINFO
-         
-         ld   h,0
-         ld   l,a
-         ld   bc,#0D26
-         call NUMBER2
-         
-;pokud je General setting nastavena autoconfigurace, tak pri neuspesnem detekovani zarizeni se do CHS ulozi nuly a HDD pak nasledne nebude nainstalovan         
-         ld a,(@autoconfig)
-         or a
-         jr z,nemenCHSs1
-         xor a
-         ld b,4
-         ld hl,VDT+(VDTLEN/2)
-nulydoCHSs  ld (hl),a
-         inc hl
-         djnz nulydoCHSs
-nemenCHSs1     
-         jp Endinentify
-
-SLAVEINFO
-         ld   hl,TEXT4
-         ld   bc,#0E02
-         call T42_TEXT
-         ld   hl,TEXT5
-         ld   bc,#0F02
-         call T42_TEXT
-         ld   hl,TEXT6
-         ld   bc,#1002
-         call T42_TEXT
-         ld   hl,TEXT7
-         ld   bc,#1102
-         call T42_TEXT
-         ld   hl,TEXT101
-         ld   bc,#1202
-         call T42_TEXT
-         ld   hl,TEXT102
-         ld   bc,#1215
-         call T42_TEXT
-
+;/* ;vyruseni SLAVE
+;
+;	ld	hl,TEXT8
+;	ld	bc,#0D02
+;	call	T42_TEXT
+;
+;	ld	ix,BUFFER
+;	ld	a,%00010000
+;	call	IDENTIFY
+;
+;	ld	hl,TEXT16
+;	push	af
+;	jr	z,TISKSTATUS2
+;	ld	hl,TEXT11
+;	cp	255
+;	jp	z,TISKSTATUS2
+;	ld	hl,TEXT14
+;	cp	6
+;	jp	z,TISKSTATUS2
+;	ld	hl,TEXT13
+;	cp	3
+;	jp	z,TISKSTATUS2
+;	ld	hl,TEXT12
+;	dec	a
+;	jp	z,TISKSTATUS2
+;	ld	hl,TEXT15
+;
+;TISKSTATUS2
+;	ld	bc,#0D0F
+;	call	T42_TEXT
+;
+;	pop	af
+;	jr	z,SLAVEINFO
+;
+;	ld	h,0
+;	ld	l,a
+;	ld	bc,#0D26
+;	call	NUMBER2
+;
+;;pokud je General setting nastavena autoconfigurace, tak pri neuspesnem detekovani zarizeni se do CHS ulozi nuly a HDD pak nasledne nebude nainstalovan
+;	ld	a,(@autoconfig)
+;	or	a
+;	jr	z,nemenCHSs1
+;	xor	a
+;	ld	b,4
+;	ld	hl,VDT+(VDTLEN/2)
+;nulydoCHSs
+;	ld	(hl),a
+;	inc	hl
+;	djnz	nulydoCHSs
+;nemenCHSs1
+;	jp	Endinentify
+;
+;SLAVEINFO
+;	ld	hl,TEXT4
+;	ld	bc,#0E02
+;	call	T42_TEXT
+;	ld	hl,TEXT5
+;	ld	bc,#0F02
+;	call	T42_TEXT
+;	ld	hl,TEXT6
+;	ld	bc,#1002
+;	call	T42_TEXT
+;	ld	hl,TEXT7
+;	ld	bc,#1102
+;	call	T42_TEXT
+;	ld	hl,TEXT101
+;	ld	bc,#1202
+;	call	T42_TEXT
+;	ld	hl,TEXT102
+;	ld	bc,#1215
+;	call	T42_TEXT
+;
 ;model
-         ld   hl,BUFFER+54
-         ld   b,40
-         call PROHOD
-         set  7,(ix+85)
-
-         ld   bc,#0E09
-         call T42_TEXT
-
+;	ld	hl,BUFFER+54
+;	ld	b,40
+;	call	PROHOD
+;	set	7,(ix+85)
+;
+;	ld	bc,#0E09
+;	call	T42_TEXT
+;
 ;firmware
-         ld   hl,BUFFER+46
-         ld   b,8
-         call PROHOD
-         set  7,(ix+53)
-
-         ld   bc,#0F0C
-         call T42_TEXT
-
+;	ld	hl,BUFFER+46
+;	ld	b,8
+;	call	PROHOD
+;	set	7,(ix+53)
+;
+;	ld	bc,#0F0C
+;	call	T42_TEXT
+;
 ;serial number
-
-         ld   hl,BUFFER+20
-         ld   b,20
-         call PROHOD
-         set  7,(ix+39)
-
-         ld   bc,#1011
-         call T42_TEXT
+;
+;	ld	hl,BUFFER+20
+;	ld	b,20
+;	call	PROHOD
+;	set	7,(ix+39)
+;
+;	ld	bc,#1011
+;	call	T42_TEXT
 ;LBA
-         ld   hl,TEXT_NO
-         bit  1,(ix+99)
-         jr   z,L11
-
-         ld   hl,TEXT_YES
-L11      ld   bc,#110D
-         call T42_TEXT
-
+;	ld	hl,TEXT_NO
+;	bit	1,(ix+99)
+;	jr	z,L11
+;
+;	ld	hl,TEXT_YES
+;L11	ld	bc,#110D
+;	call	T42_TEXT
+;
 ;DMA
-         ld   hl,TEXT_NO
-         bit  0,(ix+99)
-         jr   z,L12
-
-         ld   hl,TEXT_YES
-L12      ld   bc,#1125
-         call T42_TEXT
-
-;CHS
-				 ld l,(ix+2)
-				 ld h,(ix+3)
-         ld   bc,#1209
-         call NUMBER4              
-         
-         ld l,(ix+6)
-				 ld h,(ix+7)
-         ld   bc,#120f
-         call NUMBER1
-         
-         ld l,(ix+12)
-				 ld h,(ix+13)
-         ld   bc,#1212
-         call NUMBER1
-;pokud je General setting nastavena autoconfigurace, tak pri uspesnem detekovani zarizeni se do CHS ulozi zjistene udaje         
-         
-         ld a,(@autoconfig)
-         or a
-         jr z,nemenCHSs2
-         ld hl,VDT+(VDTLEN/2)
-         ld a,(ix+12)
-         ld (hl),a
-         ld a,(ix+6)
-         inc hl
-         ld (hl),a
-         ld a,(ix+2)
-         inc hl
-         ld (hl),a
-         ld a,(ix+3)
-         inc hl
-         ld (hl),a
-                           
-nemenCHSs2         
-
-;capacity                          
-				 ld l,(ix+12)
-				 ld h,(ix+13)
-         ld e,(ix+6)
-				 ld d,(ix+7)
-				 
-				 push ix ; rutina nasob pouziva IX
-         call nasobeniHLDE.nasob
-         pop ix
-         ld e,(ix+2)
-				 ld d,(ix+3)
-				 push ix
-         call nasobeniHLDE.nasob
+;	ld	hl,TEXT_NO
+;	bit	0,(ix+99)
+;	jr	z,L12
+;
+;	ld	hl,TEXT_YES
+;L12	ld	bc,#1125
+;	call	T42_TEXT
+;
+;;CHS
+;	ld	l,(ix+2)
+;	ld	h,(ix+3)
+;	ld	bc,#1209
+;	call	NUMBER4
+;
+;	ld	l,(ix+6)
+;	ld	h,(ix+7)
+;	ld	bc,#120f
+;	call	NUMBER1
+;
+;	ld	l,(ix+12)
+;	ld	h,(ix+13)
+;	ld	bc,#1212
+;	call	NUMBER1
+;;pokud je General setting nastavena autoconfigurace, tak pri uspesnem detekovani zarizeni se do CHS ulozi zjistene udaje
+;
+;	ld	a,(@autoconfig)
+;	or	a
+;	jr	z,nemenCHSs2
+;	ld	hl,VDT+(VDTLEN/2)
+;	ld	a,(ix+12)
+;	ld	(hl),a
+;	ld	a,(ix+6)
+;	inc	hl
+;	ld	(hl),a
+;	ld	a,(ix+2)
+;	inc	hl
+;	ld	(hl),a
+;	ld	a,(ix+3)
+;	inc	hl
+;	ld	(hl),a
+;
+;nemenCHSs2
+;
+;capacity
+;	ld	l,(ix+12)
+;	ld	h,(ix+13)
+;	ld	e,(ix+6)
+;	ld	d,(ix+7)
+;
+;	push	ix		;rutina nasob pouziva IX
+;	call	nasobeniHLDE.nasob
+;	pop	ix
+;	ld	e,(ix+2)
+;	ld	d,(ix+3)
+;	push	ix
+;	call	nasobeniHLDE.nasob
 ;vysledek je v IXHL
-
-				 ld l,h
-				 ld a,lx
-				 ld h,a
-				 ld e,hx
-
+;
+;	ld	l,h
+;	ld	a,lx
+;	ld	h,a
+;	ld	e,hx
+;
 ;delime 256 vysledek EHL
-         ld b,3
-trikrat2
-         srl e
-         rr h
-         rr l
-         djnz trikrat2				 
+;	ld	b,3
+;trikrat2
+;	srl	e
+;	rr	h
+;	rr	l
+;	djnz	trikrat2
 ;delime tremi
-         ld   bc,#121F         
-         call NUMBER3
-         
-         pop ix
-
-
+;	ld	bc,#121F
+;	call	NUMBER3
+;
+;	pop	ix
+;
+;
 ;LBA 48Bits
-
-         inc  hx
-
-         ld   hl,TEXT_NO
-         bit  2,(ix-83)
-         jr   z,L13
-
-         ld   hl,TEXT_YES
-L13      ld   bc,#111C
-         call T42_TEXT
-
+;
+;	inc	hx
+;
+;	ld	hl,TEXT_NO
+;	bit	2,(ix-83)
+;	jr	z,L13
+;
+;	ld	hl,TEXT_YES
+;L13	ld	bc,#111C
+;	call	T42_TEXT
+;
 ;
 ;hledani prvni sectoru pro data
 ;prohledava se MBR, prvni partion, a hleda se v root dir. prvni datovy sector prvniho souboru
@@ -706,1266 +699,1279 @@ L13      ld   bc,#111C
 ;11h, 12h � pocet polozek v ROOTu
 ;16h, 17h � pocet sektoru ve FAT
 ;prvn� datov� sektor je: zacatek_partition + sektoru_pred_FAT + sektoru_ve_FAT * pocet_FAT + polozek_v_ROOT * 20h / bytu_na_sektor
-
-					ld hl,TEXTPARSEC
-					ld bc,#1302
-          call T42_TEXT
- 
-;nacteni MBR         
-         ld   ix,BUFFER
-         ld   a,%00010000 ;slave
-         ld   bc,0
-         ld   de,0 ; LBA=0 MBR
-         call LBAREAD  
-; dodelat osetreni erroru
-         inc hx
-         inc hx ; + 512
-         ld   e,(ix-58) ; info o prvni partition zacina na #1BE
-         ld   d,(ix-57)
-         ex   de,hl ; v hl je cislo sectoru kde zacina boot prvni par.
-         ld (bootsec2+1),hl ; schovame cislo bootsectoru pro vypocet
-         ld   bc,#1310
-         push hl
-         call NUMBER3
+;
+;	ld	hl,TEXTPARSEC
+;	ld	bc,#1302
+;	call	T42_TEXT
+;
+;;nacteni MBR
+;	ld	ix,BUFFER
+;	ld	a,%00010000	;slave
+;	ld	bc,0
+;	ld	de,0		;LBA=0 MBR
+;	call	LBAREAD
+;; dodelat osetreni erroru
+;	inc	hx
+;	inc	hx 		;+512
+;	ld	e,(ix-58)	;info o prvni partition zacina na #1BE
+;	ld	d,(ix-57)
+;	ex	de,hl		;v hl je cislo sectoru kde zacina boot prvni par.
+;	ld	(bootsec2+1),hl	;schovame cislo bootsectoru pro vypocet
+;	ld	bc,#1310
+;	push	hl
+;	call	NUMBER3
 ;nacteni BOOT sectoru prvni partition
-         pop hl
-         ld c,l
-         ld e,h
-         ld d,0
-         ld b,d
-         ld   ix,BUFFER
-         ld   a,%00010000 ;slave
-         call LBAREAD
+;	pop	hl
+;	ld	c,l
+;	ld	e,h
+;	ld	d,0
+;	ld	b,d
+;	ld	ix,BUFFER
+;	ld	a,%00010000	;slave
+;	call	LBAREAD
 ; dodelat osetreni erroru
 ; vypocet datove oblasti prvniho souboru
-					
-					ld hl,TEXTDATASEC
-					ld bc,#1315
-          call T42_TEXT
-
-bootsec2   ld hl,0
-					ld e,(ix+14); pricteme sectory pred FAT
-					ld d,(ix+15)
-					add hl,de
-					push hl
-					push ix
-					ld e,(ix+16); pocet FAT
-					ld d,0
-					ld l,(ix+22); pocet sektoru ve FAT
-					ld h,(ix+23)
-          call nasobeniHLDE.nasob ; vysledek v IXHL
-					pop ix
-					pop de
-					add hl,de ; pricteme jen spodnich 16 bitu
-          ld e,(ix+17); pocet polozek v ROOTu
-					ld d,(ix+18)
-					; vydelime 16; predpokladame velikost sec. 512 a 32bytu v root polozce
-         ld b,4
-ctyrikrat2 
-         srl d
-         rr e
-         djnz ctyrikrat2
-				 add hl,de
-				 push hl  
-         ld   bc,#1323
-         call NUMBER4
-         pop hl
-;pokud je General setting nastavena autoconfigurace, tak ulozi vypocteny prvni datovy sector         
-         
-         ld a,(@autoconfig)
-         or a
-         jr z,nemenfirstdatasectorm2
-         ld de,VDT+(VDTLEN/2)+5
-         ex de,hl
-         ld (hl),e
-         inc hl
-         ld (hl),d
-         
-nemenfirstdatasectorm2       
-
-/*
+;
+;	ld	hl,TEXTDATASEC
+;	ld	bc,#1315
+;	call	T42_TEXT
+;
+;bootsec2
+;	ld	hl,0
+;	ld	e,(ix+14)	;pricteme sectory pred FAT
+;	ld	d,(ix+15)
+;	add	hl,de
+;	push	hl
+;	push	ix
+;	ld	e,(ix+16)	;pocet FAT
+;	ld	d,0
+;	ld	l,(ix+22)	;pocet sektoru ve FAT
+;	ld	h,(ix+23)
+;	call	nasobeniHLDE.nasob	;vysledek v IXHL
+;	pop	ix
+;	pop	de
+;	add	hl,de		;pricteme jen spodnich 16 bitu
+;	ld	e,(ix+17)	;pocet polozek v ROOTu
+;	ld	d,(ix+18)
+;	; vydelime 16; predpokladame velikost sec. 512 a 32bytu v root polozce
+;	ld	b,4
+;ctyrikrat2
+;	srl	d
+;	rr	e
+;	djnz	ctyrikrat2
+;	add	hl,de
+;	push	hl
+;	ld	bc,#1323
+;	call	NUMBER4
+;	pop	hl
+;;pokud je General setting nastavena autoconfigurace, tak ulozi vypocteny prvni datovy sector
+;
+;	ld	a,(@autoconfig)
+;	or	a
+;	jr	z,nemenfirstdatasectorm2
+;	ld	de,VDT+(VDTLEN/2)+5
+;	ex	de,hl
+;	ld	(hl),e
+;	inc	hl
+;	ld	(hl),d
+;
+;nemenfirstdatasectorm2
+;
+;/*
 ;LBA Total sectors
-
-         ld   hl,(BUFFER+200)
-         ld   (D2LBA),hl
-         ld   bc,#1124
-         call NUMBER4
-
-         ld   hl,(BUFFER+202)
-         ld   (D2LBA+2),hl
-         ld   bc,#111E
-         call NUMBER4
-
-         ld   hl,(BUFFER+204)
-         ld   (D2LBA+4),hl
-         ld   bc,#1118
-         call NUMBER4
-*/
-
-*/ ;vyruseni SLAVE
-
-         ld   hl,TEXT17
-         ld   bc,#0E02
-         call T42_TEXT
-         ld   hl,TEXT18
-         ld   bc,#0F03
-         call T42_TEXT
-         ld   hl,TEXT19
-         ld   bc,#1003
-         call T42_TEXT		 
+;
+;	ld	hl,(BUFFER+200)
+;	ld	(D2LBA),hl
+;	ld	bc,#1124
+;	call	NUMBER4
+;
+;	ld	hl,(BUFFER+202)
+;	ld	(D2LBA+2),hl
+;	ld	bc,#111E
+;	call	NUMBER4
+;
+;	ld	hl,(BUFFER+204)
+;	ld	(D2LBA+4),hl
+;	ld	bc,#1118
+;	call	NUMBER4
+;*/
+;
+;vyruseni SLAVE
+;*/
+	ld	hl,TEXT17
+	ld	bc,#0E02
+	call	T42_TEXT
+	ld	hl,TEXT18
+	ld	bc,#0F03
+	call	T42_TEXT
+	ld	hl,TEXT19
+	ld	bc,#1003
+	call	T42_TEXT
 
 Endinentify
-				
-		 ld   hl,TEXT100
-         ld   bc,#1608
-         call T42_TEXT
-         
-         ld a,(@autoinstall)
-         or a
-         call z,ANYKEY
-         ret
-; navrat  
+
+	ld	hl,TEXT100
+	ld	bc,#1608
+	call	T42_TEXT
+
+	ld	a,(@autoinstall)
+	or	a
+	call	z,ANYKEY
+	ret
+; navrat
 
 ;------------------------------
-TEXT1    dc 16,70,"EasyHDD 2.07 for MB03+"
-TEXT2    dc 16,3,127," LMN128/8BC 2019"
-TEXT3    dc 16,70,"MASTER DISK:"
-TEXT4    dc 16,70,"Model:"
-TEXT5    dc 16,70,"Firmware:"
-TEXT6    dc 16,70,"Serial number:"
-TEXT7    dc 16,70,"LBA28-bit:     LBA48-bit:     DMA:"
-TEXT8    dc 16,70,"SLAVE DISK:"
-TEXT9    db "Total LBA 48 bi"
-         dc "t sec.:"
-TEXT10   db "Start cloning ("
-         dc "1/2/n)"
-TEXT11   dc 16,66,"Disk time out"
-TEXT12   dc 16,66,"Status b0 error"
-TEXT13   dc 16,66,"DRQ error      "
-TEXT14   dc 16,66,"Drive not ready"
-TEXT15   dc 16,66,"Other error    "
-TEXT16   db 16,69,"OK             "
-         dc "     "
-TEXT17	 dc 16,70,"DMA Speed:"
-TEXT18	 db 16,70,"Port: "
-		 db 16,69
-		 dc "2T"
-TEXT19	 db 16,70,"Memory: "	
-		 db 16,69
-		 dc "3T"		 
-/*
-TEXT17   db "Read errors:   "
-         dc "    "
-TEXT18   db "Write errors:  "
-         dc "   "
-TEXT19   db "Sector counter:"
-         dc "     "
-TEXT20   db "---------------"
-         db "---------------"
-         dc "----------"
-TEXT21   db "WARNING! "
-         db "Drives aren't i"
-         dc "dentical!!!"
-TEXT22   db "Drives are "
-         dc "idencial"
-TEXT23   db "Cloning complet"
-         dc "ed"
-TEXT24   dc "1. COUNTDOWN"
-TEXT25   dc "2. COUNTUP"
-*/
-TEXT_YES dc 16,69,"Yes"
-TEXT_NO  dc 16,69,"No"
-TEXT_CLR db "               "
-         db "               "
-         dc "         "
-		 
-TEXT100  dc 16,67,"Press any key to install"
-TEXT101  dc 16,70,"C/H/S:"
-TEXT102  db 16,70,"Capacity: "
-				 dc 16,69,"     MB"
-TEXTPARSEC db 16,70,"1st Par. Sec.:"
-  					dc 16,69," "	 
- 
-TEXTDATASEC db 16,70,"1st Data Sec.:"
-					dc 16,69," "	 
+TEXT1	dc	16,70,"EasyHDD 2.07 for MB03+"
+TEXT2	dc	16,3,127," LMN128/8BC 2019"
+TEXT3	dc	16,70,"MASTER DISK:"
+TEXT4	dc	16,70,"Model:"
+TEXT5	dc	16,70,"Firmware:"
+TEXT6	dc	16,70,"Serial number:"
+TEXT7	dc	16,70,"LBA28-bit:     LBA48-bit:     DMA:"
+TEXT8	dc	16,70,"SLAVE DISK:"
+TEXT9	db	"Total LBA 48 bi"
+	dc	"t sec.:"
+TEXT10	db	"Start cloning ("
+	dc	"1/2/n)"
+TEXT11	dc	16,66,"Disk time out"
+TEXT12	dc	16,66,"Status b0 error"
+TEXT13	dc	16,66,"DRQ error      "
+TEXT14	dc	16,66,"Drive not ready"
+TEXT15	dc	16,66,"Other error    "
+TEXT16	db	16,69,"OK             "
+	dc	"     "
+TEXT17	dc	16,70,"DMA Speed:"
+TEXT18	db	16,70,"Port: "
+	db	16,69
+	dc	"2T"
+TEXT19	db	16,70,"Memory: "
+	db	16,69
+	dc	"3T"
+;/*
+;TEXT17	db	"Read errors:   "
+;	dc	"    "
+;TEXT18	db	"Write errors:  "
+;	dc	"   "
+;TEXT19	db	"Sector counter:"
+;	dc	"     "
+;TEXT20	db	"---------------"
+;	db	"---------------"
+;	dc	"----------"
+;TEXT21	db	"WARNING! "
+;	db	"Drives aren't i"
+;	dc	"dentical!!!"
+;TEXT22	db	"Drives are "
+;	dc	"idencial"
+;TEXT23	db	"Cloning complet"
+;	dc	"ed"
+;TEXT24	dc	"1. COUNTDOWN"
+;TEXT25	dc	"2. COUNTUP"
+;*/
+TEXT_YES
+	dc	16,69,"Yes"
+TEXT_NO	dc	16,69,"No"
+TEXT_CLR
+	db	"               "
+	db	"               "
+	dc	"         "
+
+TEXT100	dc	16,67,"Press any key to install"
+TEXT101	dc	16,70,"C/H/S:"
+TEXT102	db	16,70,"Capacity: "
+	dc	16,69,"     MB"
+TEXTPARSEC
+	db	16,70,"1st Par. Sec.:"
+	dc	16,69," "
+
+TEXTDATASEC
+	db	16,70,"1st Data Sec.:"
+	dc	16,69," "
 ;------------------------------
 ;------------------------------
-T_X      equ  0
-T_Y      equ  0
-T_XLEN   equ  31
-T_YLEN   equ  24
-T_ATTR1  equ  %01010110
-T_ATTR2  equ  %01000110
-T_ATTR3  equ  70
+T_X	equ	0
+T_Y	equ	0
+T_XLEN	equ	31
+T_YLEN	equ	24
+T_ATTR1	equ	%01010110
+T_ATTR2	equ	%01000110
+T_ATTR3	equ	70
 ;------------------------------
 T_START
-T_ATTR   ld   b,T_Y+1
-         ld   de,32
-         ld   hl,22528+T_X-32
-T_COL1   add  hl,de
-         djnz T_COL1
-         ld   bc,T_XLEN
-         ld   d,h
-         ld   e,l
-         inc  de
-         ld   (hl),T_ATTR1
-         push hl
-         push bc
-         ldir
-         pop  bc
-         pop  hl
-         dec  bc
-         ld   a,T_YLEN
-         dec  a
-         ld   de,32
-         add  hl,de
-T_COL2   push hl
-         push bc
-         push de
-         ld   (hl),T_ATTR2
-         ld   d,h
-         ld   e,l
-         inc  de
-         ldir
-         ex   de,hl
-         ld   (hl),T_ATTR1
-         pop  de
-         pop  bc
-         pop  hl
-         add  hl,de
-         dec  a
-         jr   nz,T_COL2
+T_ATTR	ld	b,T_Y+1
+	ld	de,32
+	ld	hl,22528+T_X-32
+T_COL1	add	hl,de
+	djnz	T_COL1
+	ld	bc,T_XLEN
+	ld	d,h
+	ld	e,l
+	inc	de
+	ld	(hl),T_ATTR1
+	push	hl
+	push	bc
+	ldir
+	pop	bc
+	pop	hl
+	dec	bc
+	ld	a,T_YLEN
+	dec	a
+	ld	de,32
+	add	hl,de
+T_COL2	push	hl
+	push	bc
+	push	de
+	ld	(hl),T_ATTR2
+	ld	d,h
+	ld	e,l
+	inc	de
+	ldir
+	ex	de,hl
+	ld	(hl),T_ATTR1
+	pop	de
+	pop	bc
+	pop	hl
+	add	hl,de
+	dec	a
+	jr	nz,T_COL2
 
 T_CARY
-         ld   b,T_Y
-         ld   c,T_X
-         ld   hl,T_HELP1
-         push bc
-         call T_ONE
-         pop  bc
-         inc  b
-         ld   hl,T_HELP2
-         push bc
-         call T_ONE
-         pop  bc
-         inc  b
-         ld   a,T_YLEN
-         sub  3
-T_CAR1   ld   hl,T_HELP3
-         push bc
-         push af
-         call T_ONE
-         pop  af
-         pop  bc
-         inc  b
-         dec  a
-         jr   nz,T_CAR1
-         ld   hl,T_HELP4
+	ld	b,T_Y
+	ld	c,T_X
+	ld	hl,T_HELP1
+	push	bc
+	call	T_ONE
+	pop	bc
+	inc	b
+	ld	hl,T_HELP2
+	push	bc
+	call	T_ONE
+	pop	bc
+	inc	b
+	ld	a,T_YLEN
+	sub	3
+T_CAR1	ld	hl,T_HELP3
+	push	bc
+	push	af
+	call	T_ONE
+	pop	af
+	pop	bc
+	inc	b
+	dec	a
+	jr	nz,T_CAR1
+	ld	hl,T_HELP4
 
-T_ONE    ld   a,(hl)
-         push hl
-         push bc
-         call T_ZNAK
-         pop  bc
-         pop  hl
-         inc  c
-         inc  hl
-         ld   d,T_XLEN-1
-         ld   e,(hl)
-         push hl
-T_CYKL   push bc
-         push de
-         ld   a,e
-         call T_ZNAK
-         pop  de
-         pop  bc
-         inc  c
-         dec  d
-         jr   nz,T_CYKL
-         pop  hl
-         inc  hl
-         ld   a,(hl)
+T_ONE	ld	a,(hl)
+	push	hl
+	push	bc
+	call	T_ZNAK
+	pop	bc
+	pop	hl
+	inc	c
+	inc	hl
+	ld	d,T_XLEN-1
+	ld	e,(hl)
+	push	hl
+T_CYKL	push	bc
+	push	de
+	ld	a,e
+	call	T_ZNAK
+	pop	de
+	pop	bc
+	inc	c
+	dec	d
+	jr	nz,T_CYKL
+	pop	hl
+	inc	hl
+	ld	a,(hl)
 
-T_ZNAK   ld   h,0
-         ld   l,a
-         ld   de,T_0
-         add  hl,hl
-         add  hl,hl
-         add  hl,hl
-         add  hl,de
-         ld   a,b
-         rrca
-         rrca
-         rrca
-         and  #E0
-         add  a,c
-         ld   e,a
-         ld   a,b
-         and  #18
-         or   #40
-         ld   d,a
-         ld   b,8
-T_ZNA1   ld   a,(hl)
-         ld   (de),a
-         inc  hl
-         inc  d
-         djnz T_ZNA1
-         ret
+T_ZNAK	ld	h,0
+	ld	l,a
+	ld	de,T_0
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,de
+	ld	a,b
+	rrca
+	rrca
+	rrca
+	and	#E0
+	add	a,c
+	ld	e,a
+	ld	a,b
+	and	#18
+	or	#40
+	ld	d,a
+	ld	b,8
+T_ZNA1	ld	a,(hl)
+	ld	(de),a
+	inc	hl
+	inc	d
+	djnz	T_ZNA1
+	ret
 
-T_HELP1  defb 0,1,2
-T_HELP2  defb 3,10,6
-T_HELP3  defb 3,10,4
-T_HELP4  defb 5,9,7
+T_HELP1	defb	0,1,2
+T_HELP2	defb	3,10,6
+T_HELP3	defb	3,10,4
+T_HELP4	defb	5,9,7
 
-T_0      defb 255
-         defb 129
-         defb 129
-         defb 189
-         defb 189
-         defb 129
-         defb 129
-         defb 255
-T_1      defb 255
-         defb 0
-         defb 0
-         defb 0
-         defb 0
-         defb 0
-         defb 0
-         defb 255
-T_2      defb 255
-         defb 129
-         defb %10111001
-         defb %10111001
-         defb %10011101
-         defb %10011101
-         defb 129
-         defb 255
-T_3      defb 128
-         defb 128
-         defb 128
-         defb 128
-         defb 128
-         defb 128
-         defb 128
-         defb 128
-T_4      defb 129
-         defb 129
-         defb 129
-         defb 129
-         defb 129
-         defb 129
-         defb 129
-         defb 129
-T_5      defb 128
-         defb 128
-         defb 128
-         defb 128
-         defb 128
-         defb 128
-         defb 128
-         defb 255
-T_6      defb 255
-         defb 129
-         defb 153
-         defb 189
-         defb 153
-         defb 153
-         defb 129
-         defb 255
-T_7      defb 255
-         defb 129
-         defb 153
-         defb 153
-         defb 189
-         defb 153
-         defb 129
-         defb 255
-T_8      defb 255
-         defb 129
-         defb 129
-         defb 153
-         defb 153
-         defb 129
-         defb 129
-         defb 255
-T_9      defb 0
-         defb 0
-         defb 0
-         defb 0
-         defb 0
-         defb 0
-         defb 0
-         defb 255
-T_10     defb 0
-         defb 0
-         defb 0
-         defb 0
-         defb 0
-         defb 0
-         defb 0
-         defb 0
+T_0	defb	255
+	defb	129
+	defb	129
+	defb	189
+	defb	189
+	defb	129
+	defb	129
+	defb	255
+T_1	defb	255
+	defb	0
+	defb	0
+	defb	0
+	defb	0
+	defb	0
+	defb	0
+	defb	255
+T_2	defb	255
+	defb	129
+	defb	%10111001
+	defb	%10111001
+	defb	%10011101
+	defb	%10011101
+	defb	129
+	defb	255
+T_3	defb	128
+	defb	128
+	defb	128
+	defb	128
+	defb	128
+	defb	128
+	defb	128
+	defb	128
+T_4	defb	129
+	defb	129
+	defb	129
+	defb	129
+	defb	129
+	defb	129
+	defb	129
+	defb	129
+T_5	defb	128
+	defb	128
+	defb	128
+	defb	128
+	defb	128
+	defb	128
+	defb	128
+	defb	255
+T_6	defb	255
+	defb	129
+	defb	153
+	defb	189
+	defb	153
+	defb	153
+	defb	129
+	defb	255
+T_7	defb	255
+	defb	129
+	defb	153
+	defb	153
+	defb	189
+	defb	153
+	defb	129
+	defb	255
+T_8	defb	255
+	defb	129
+	defb	129
+	defb	153
+	defb	153
+	defb	129
+	defb	129
+	defb	255
+T_9	defb	0
+	defb	0
+	defb	0
+	defb	0
+	defb	0
+	defb	0
+	defb	0
+	defb	255
+T_10	defb	0
+	defb	0
+	defb	0
+	defb	0
+	defb	0
+	defb	0
+	defb	0
+	defb	0
 ;------------------------------
 ;TISK CISLA BC-POZICE HL-HODNOT
 ;TISKNE CISLO TYPU INTEGER
 ;STAR-RUTINA TISKU 1 ZNAKU NA
 ;POZICI BC (0,0)
-NUMBER4  ld   de,-10000
-         call NUM_JED
-NUMBER3  ld   de,-1000
-         call NUM_JED
-NUMBER2  ld   de,-100
-         call NUM_JED
-NUMBER1  ld   de,-10
-         call NUM_JED
-NUMBER0  ld   a,l
-         add  a,48
-         jp   T42
+NUMBER4	ld	de,-10000
+	call	NUM_JED
+NUMBER3	ld	de,-1000
+	call	NUM_JED
+NUMBER2	ld	de,-100
+	call	NUM_JED
+NUMBER1	ld	de,-10
+	call	NUM_JED
+NUMBER0	ld	a,l
+	add	a,48
+	jp	T42
 
-NUM_JED  xor  a
-NUM_JED1 add  hl,de
-         jr   nc,NUM_PRIC
-         inc  a
-         jr   NUM_JED1
-NUM_PRIC sbc  hl,de
-         add  a,48
-         push bc
-         push hl
-         call T42
-         pop  hl
-         pop  bc
-         inc  c
-         ret
-/*
-T42_TEXT ld   a,(hl)
-         and  127
-         push hl
-         push bc
-         call T42
-         pop  bc
-         pop  hl
-         inc  c
-         ld   a,(hl)
-         rla
-         inc  hl
-         jr   nc,T42_TEXT
-         ret
-*/
+NUM_JED	xor	a
+NUM_JED1
+	add	hl,de
+	jr	nc,NUM_PRIC
+	inc	a
+	jr	NUM_JED1
+NUM_PRIC
+	sbc	hl,de
+	add	a,48
+	push	bc
+	push	hl
+	call	T42
+	pop	hl
+	pop	bc
+	inc	c
+	ret
+;/*
+;T42_TEXT ld	a,(hl)
+;	and	127
+;	push	hl
+;	push	bc
+;	call	T42
+;	pop	bc
+;	pop	hl
+;	inc	c
+;	ld	a,(hl)
+;	rla
+;	inc	hl
+;	jr	nc,T42_TEXT
+;	ret
+;*/
 ;Tisk textu 42 znaku na radek
 ;-umi tisknou v danych mezich urcenych promenymi t42_borb a t42_bore
 ;-posledni znak ma nastaveny bit7
 ;-podporuje enter 13
 ;-umi tiskout i barvy dle promene t42_att; pokud je nula neobarvuje
 ;-podporuje znemu barvy pres kod 16 nasledovany hodnotou attributu
-T42_TEXT ld   a,(hl)
-         and  127
-         cp   13
-         jr   z,T42_ZMEN
-         cp   16
-         jr		z,T42_ZMENCOLOR
-         push hl
-         push bc
-         call T42
-         pop  bc
-         pop  hl
-         ld   a,(T42_BORE)
-         dec  a
-         cp   c
-         jr   c,T42_ZMEN
-         inc  c
-T42_BACK ld   a,(hl)
-         rla
-         ret  c
-         inc  hl
-         jr   T42_TEXT
+T42_TEXT
+	ld	a,(hl)
+	and	127
+	cp	13
+	jr	z,T42_ZMEN
+	cp	16
+	jr	z,T42_ZMENCOLOR
+	push	hl
+	push	bc
+	call	T42
+	pop	bc
+	pop	hl
+	ld	a,(T42_BORE)
+	dec	a
+	cp	c
+	jr	c,T42_ZMEN
+	inc	c
+T42_BACK
+	ld	a,(hl)
+	rla
+	ret	c
+	inc	hl
+	jr	T42_TEXT
 
-T42_ZMEN ld   a,(T42_BORB)
-         ld   c,a
-         inc  b
-         ld   a,b
-         cp   24
-         jr   c,T42_BACK
-         ld   b,0
-         jr   T42_BACK
+T42_ZMEN
+	ld	a,(T42_BORB)
+	ld	c,a
+	inc	b
+	ld	a,b
+	cp	24
+	jr	c,T42_BACK
+	ld	b,0
+	jr	T42_BACK
 T42_ZMENCOLOR
-					inc hl
-					ld a,(hl)
-					ld (T42_ATT),a
-					jr T42_BACK
-					
-T42_BORB defb 1
-T42_BORE defb 41
-T42_ATT		defb 0
+	inc	hl
+	ld	a,(hl)
+	ld	(T42_ATT),a
+	jr	T42_BACK
+
+T42_BORB
+	defb	1
+T42_BORE
+	defb	41
+T42_ATT	defb	0
 
 ;Tisk 42 znaku na radek
 ;pocatek vlevo nahore (0,0)
 
-T42      ld   de,T42_SADA-256
-         ld   h,0
-         ld   l,a
-         add  hl,hl
-         add  hl,hl
-         add  hl,hl
-         add  hl,de
-         ld   a,b
-         rrca
-         rrca
-         rrca
-         and  %11100000
-         ld   e,a
-         ld   a,b
-         and  %00011000
-         or   %01000000
-         ld   d,a
-         ld   a,c
-         and  %00111100
-         rrca
-         rrca
-         ld   b,a
-         ld   a,c
-         and  %00111100
-         sub  b
-         add  a,e
-         ld   e,a
-         ld   a,c
-         and  %00000011
-         ld   b,8
-         jr   nz,T42_T123
-T42_T0   ld   a,(de)
-         and  %00000011
-         or   (hl)
-         ld   (de),a
-         inc  d
-         inc  hl
-         djnz T42_T0
-         jr T42_COLOR
-;         ret
+T42	ld	de,T42_SADA-256
+	ld	h,0
+	ld	l,a
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,de
+	ld	a,b
+	rrca
+	rrca
+	rrca
+	and	%11100000
+	ld	e,a
+	ld	a,b
+	and	%00011000
+	or	%01000000
+	ld	d,a
+	ld	a,c
+	and	%00111100
+	rrca
+	rrca
+	ld	b,a
+	ld	a,c
+	and	%00111100
+	sub	b
+	add	a,e
+	ld	e,a
+	ld	a,c
+	and	%00000011
+	ld	b,8
+	jr	nz,T42_T123
+T42_T0	ld	a,(de)
+	and	%00000011
+	or	(hl)
+	ld	(de),a
+	inc	d
+	inc	hl
+	djnz	T42_T0
+	jr	T42_COLOR
+;	ret
 
-T42_T123 cp   2
-         jr   c,T42_T1
-         jr   z,T42_T2
-T42_T3   inc  e
-         inc  e
-T42_T31  ld   a,(de)
-         and  %11000000
-         ld   c,a
-         ld   a,(hl)
-         rrca
-         rrca
-         or   c
-         ld   (de),a
-         inc  d
-         inc  hl
-         djnz T42_T31
-         jr T42_COLOR
+T42_T123
+	cp	2
+	jr	c,T42_T1
+	jr	z,T42_T2
+T42_T3	inc	e
+	inc	e
+T42_T31	ld	a,(de)
+	and	%11000000
+	ld	c,a
+	ld	a,(hl)
+	rrca
+	rrca
+	or	c
+	ld	(de),a
+	inc	d
+	inc	hl
+	djnz	T42_T31
+	jr	T42_COLOR
 
-         ;ret
+;	ret
 
-T42_T1   xor  a
-         ld   (T42_P3),a
-         ld   (T42_P4),a
-         ld   a,%11111100
-         ld   (T42_P1+1),a
-         cpl
-         call T42_P_A
-         ld   a,%00001111
-         ld   (T42_P1+1),a
-         cpl
-         jr   T42_P_B
+T42_T1	xor	a
+	ld	(T42_P3),a
+	ld	(T42_P4),a
+	ld	a,%11111100
+	ld	(T42_P1+1),a
+	cpl
+	call	T42_P_A
+	ld	a,%00001111
+	ld	(T42_P1+1),a
+	cpl
+	jr	T42_P_B
 
-T42_T2   inc  e
-         ld   a,7
-         ld   (T42_P3),a
-         ld   (T42_P4),a
-         ld   a,%11110000
-         ld   (T42_P1+1),a
-         cpl
-         call T42_P_A
-         ld   a,%00111111
-         ld   (T42_P1+1),a
-         cpl
+T42_T2	inc	e
+	ld	a,7
+	ld	(T42_P3),a
+	ld	(T42_P4),a
+	ld	a,%11110000
+	ld	(T42_P1+1),a
+	cpl
+	call	T42_P_A
+	ld	a,%00111111
+	ld	(T42_P1+1),a
+	cpl
 
-T42_P_B  ld   b,8
-T42_P_A  ld   (T42_P2+1),a
-         push hl
-         push de
-T42_P0   ld   a,(de)
-T42_P1   and  0
-         ld   c,a
-         ld   a,(hl)
-         rlca
-         rlca
-T42_P3   nop
-T42_P4   nop
-T42_P2   and  0
-         or   c
-         ld   (de),a
-         inc  d
-         inc  hl
-         djnz T42_P0
-         
-         push de
-         call T42_COLOR
-         pop de
-; podpora barev         
-         pop  de
-         pop  hl
-         inc  e
-         
+T42_P_B	ld	b,8
+T42_P_A	ld	(T42_P2+1),a
+	push	hl
+	push	de
+T42_P0	ld	a,(de)
+T42_P1	and	0
+	ld	c,a
+	ld	a,(hl)
+	rlca
+	rlca
+T42_P3	nop
+T42_P4	nop
+T42_P2	and	0
+	or	c
+	ld	(de),a
+	inc	d
+	inc	hl
+	djnz	T42_P0
 
-         
-         ret
+	push	de
+	call	T42_COLOR
+	pop	de
+; podpora barev
+	pop	de
+	pop	hl
+	inc	e
+
+	ret
 
 T42_COLOR
-				ld a,(T42_ATT)
-				or a
-				ret z
+	ld	a,(T42_ATT)
+	or	a
+	ret	z
 ; pokud je nula, tak se neobarvuje
-				dec d				
-				ld a,d
-				rrca
-				rrca
-				rrca
-				and 3
-				or 88
-				ld d,a
-				ld a,(T42_ATT)
-				ld (de),a
-				ret
-				
+	dec	d
+	ld	a,d
+	rrca
+	rrca
+	rrca
+	and	3
+	or	88
+	ld	d,a
+	ld	a,(T42_ATT)
+	ld	(de),a
+	ret
 
-         defb %11111100
-         defb %10000100
-         defb %10000100
-         defb %10000100
-         defb %10000100
-         defb %10000100
-         defb %10000100
-         defb %11111100
+	defb	%11111100
+	defb	%10000100
+	defb	%10000100
+	defb	%10000100
+	defb	%10000100
+	defb	%10000100
+	defb	%10000100
+	defb	%11111100
 
-         defb %00000000
-         defb %01111000
-         defb %01111000
-         defb %01111000
-         defb %01111000
-         defb %01111000
-         defb %01111000
-         defb %00000000
+	defb	%00000000
+	defb	%01111000
+	defb	%01111000
+	defb	%01111000
+	defb	%01111000
+	defb	%01111000
+	defb	%01111000
+	defb	%00000000
 
-T42_SADA defw 0,0,0,0
-         defw 35064,20560
-         defw 32,32,53456,0,0,0
-         defw 63568,20560,63568
-         defw 80,63520,63648
-         defw 63528,32,51200
-         defw 12504,55392,152
-         defw 8192,8272,34896
-         defw 112,24624,0,0,0
-         defw 24624
-         defw 24672
-         defw 24672
-         defw 48
-         defw 12384
-         defw 12336
-         defw 12336
-         defw 96
-         defw 20480
-         defw 63520
-         defw 20512
-         defw 0
-         defw 8192
-         defw 63520
-         defw 8224
-         defw 0
-         defw 0
-         defw 0
-         defw 12288
-         defw 96
-         defw 0
-         defw 30720
-         defw 0
-         defw 0
-         defw 0
-         defw 0
-         defw 24576
-         defw 96
-         defw 2048
-         defw 12312
-         defw 49248
-         defw 128
-         defw 55408
-         defw 51432
-         defw 51400
-         defw 112
-         defw 24608
-         defw 24800
-         defw 24672
-         defw 240
-         defw 34928
-         defw 28680
-         defw 49344
-         defw 248
-         defw 51312
-         defw 12296
-         defw 51208
-         defw 112
-         defw 8208
-         defw 53312
-         defw 4344
-         defw 16
-         defw 49400
-         defw 61632
-         defw 51208
-         defw 112
-         defw 51312
-         defw 61632
-         defw 51400
-         defw 112
-         defw 6392
-         defw 12312
-         defw 49248
-         defw 128
-         defw 51312
-         defw 28872
-         defw 51400
-         defw 112
-         defw 51312
-         defw 30920
-         defw 51208
-         defw 112
-         defw 0
-         defw 96
-         defw 24576
-         defw 0
-         defw 0
-         defw 48
-         defw 12288
-         defw 96
-         defw 6144
-         defw 24624
-         defw 6192
-         defw 0
-         defw 0
-         defw 120
-         defw 120
-         defw 0
-         defw 24576
-         defw 6192
-         defw 24624
-         defw 0
-         defw 55408
-         defw 12312
-         defw 32
-         defw 32
-         defw 34928
-         defw 55464
-         defw 32944
-         defw 112
-         defw 51312
-         defw 63688
-         defw 51400
-         defw 200
-         defw 51440
-         defw 61640
-         defw 51400
-         defw 240
-         defw 51312
-         defw 49344
-         defw 51392
-         defw 112
-         defw 51440
-         defw 51400
-         defw 51400
-         defw 240
-         defw 49400
-         defw 61632
-         defw 49344
-         defw 248
-         defw 49400
-         defw 61632
-         defw 49344
-         defw 192
-         defw 51312
-         defw 55488
-         defw 51400
-         defw 112
-         defw 51400
-         defw 63688
-         defw 51400
-         defw 200
-         defw 24824
-         defw 24672
-         defw 24672
-         defw 248
-         defw 2056
-         defw 2056
-         defw 51400
-         defw 112
-         defw 51400
-         defw 57552
-         defw 51408
-         defw 200
-         defw 49344
-         defw 49344
-         defw 49344
-         defw 248
-         defw 55432
-         defw 51432
-         defw 51400
-         defw 200
-         defw 51400
-         defw 59592
-         defw 51416
-         defw 200
-         defw 51312
-         defw 51400
-         defw 51400
-         defw 112
-         defw 51440
-         defw 61640
-         defw 49344
-         defw 192
-         defw 51312
-         defw 51400
-         defw 55528
-         defw 120
-         defw 51440
-         defw 61640
-         defw 51408
-         defw 200
-         defw 51312
-         defw 28864
-         defw 51208
-         defw 112
-         defw 24824
-         defw 24672
-         defw 24672
-         defw 96
-         defw 51400
-         defw 51400
-         defw 51400
-         defw 112
-         defw 51400
-         defw 51400
-         defw 20680
-         defw 32
-         defw 51400
-         defw 51400
-         defw 59592
-         defw 80
-         defw 55432
-         defw 24688
-         defw 55408
-         defw 136
-         defw 53384
-         defw 24672
-         defw 24672
-         defw 96
-         defw 6392
-         defw 24624
-         defw 49344
-         defw 248
-         defw 24696
-         defw 24672
-         defw 24672
-         defw 120
-         defw 32768
-         defw 24768
-         defw 6192
-         defw 8
-         defw 6264
-         defw 6168
-         defw 6168
-         defw 120
-         defw 28704
-         defw 8360
-         defw 8224
-         defw 32
-         defw 0
-         defw 0
-         defw 0
-         defw 252
-         defw 18480
-         defw 57416
-         defw 16448
-         defw 248
-         defw 0
-         defw 2160
-         defw 51320
-         defw 120
-         defw 49152
-         defw 61632
-         defw 51400
-         defw 240
-         defw 0
-         defw 49264
-         defw 49344
-         defw 112
-         defw 2048
-         defw 30728
-         defw 51400
-         defw 120
-         defw 0
-         defw 51312
-         defw 49392
-         defw 120
-         defw 14336
-         defw 28768
-         defw 24672
-         defw 96
-         defw 0
-         defw 51320
-         defw 30920
-         defw 28680
-         defw 49152
-         defw 61632
-         defw 51400
-         defw 200
-         defw 24576
-         defw 57344
-         defw 24672
-         defw 240
-         defw 12288
-         defw 12288
-         defw 12336
-         defw 24752
-         defw 49152
-         defw 57552
-         defw 53472
-         defw 200
-         defw 24576
-         defw 24672
-         defw 24672
-         defw 56
-         defw 0
-         defw 59600
-         defw 59624
-         defw 232
-         defw 0
-         defw 51440
-         defw 51400
-         defw 200
-         defw 0
-         defw 51312
-         defw 51400
-         defw 112
-         defw 0
-         defw 51440
-         defw 61640
-         defw 49344
-         defw 0
-         defw 51320
-         defw 30920
-         defw 6168
-         defw 0
-         defw 49272
-         defw 49344
-         defw 192
-         defw 0
-         defw 49264
-         defw 2160
-         defw 240
-         defw 24576
-         defw 24688
-         defw 24672
-         defw 56
-         defw 0
-         defw 51400
-         defw 51400
-         defw 112
-         defw 0
-         defw 51400
-         defw 28784
-         defw 32
-         defw 0
-         defw 59592
-         defw 59624
-         defw 80
-         defw 0
-         defw 55432
-         defw 55408
-         defw 136
-         defw 0
-         defw 51400
-         defw 30920
-         defw 28680
-         defw 0
-         defw 12536
-         defw 49248
-         defw 248
-         defw 24696
-         defw 49248
-         defw 24672
-         defw 120
-         defw 24672
-         defw 24672
-         defw 24672
-         defw 96
-         defw 12528
-         defw 6192
-         defw 12336
-         defw 240
-         defw 26676
-         defw 0
-         defw 0
-         defw 0
-         defw 34928
-         defw 51368
-         defw 34984
-         defw 112
+T42_SADA
+	defw	0,0,0,0
+	defw	35064,20560
+	defw	32,32,53456,0,0,0
+	defw	63568,20560,63568
+	defw	80,63520,63648
+	defw	63528,32,51200
+	defw	12504,55392,152
+	defw	8192,8272,34896
+	defw	112,24624,0,0,0
+	defw	24624
+	defw	24672
+	defw	24672
+	defw	48
+	defw	12384
+	defw	12336
+	defw	12336
+	defw	96
+	defw	20480
+	defw	63520
+	defw	20512
+	defw	0
+	defw	8192
+	defw	63520
+	defw	8224
+	defw	0
+	defw	0
+	defw	0
+	defw	12288
+	defw	96
+	defw	0
+	defw	30720
+	defw	0
+	defw	0
+	defw	0
+	defw	0
+	defw	24576
+	defw	96
+	defw	2048
+	defw	12312
+	defw	49248
+	defw	128
+	defw	55408
+	defw	51432
+	defw	51400
+	defw	112
+	defw	24608
+	defw	24800
+	defw	24672
+	defw	240
+	defw	34928
+	defw	28680
+	defw	49344
+	defw	248
+	defw	51312
+	defw	12296
+	defw	51208
+	defw	112
+	defw	8208
+	defw	53312
+	defw	4344
+	defw	16
+	defw	49400
+	defw	61632
+	defw	51208
+	defw	112
+	defw	51312
+	defw	61632
+	defw	51400
+	defw	112
+	defw	6392
+	defw	12312
+	defw	49248
+	defw	128
+	defw	51312
+	defw	28872
+	defw	51400
+	defw	112
+	defw	51312
+	defw	30920
+	defw	51208
+	defw	112
+	defw	0
+	defw	96
+	defw	24576
+	defw	0
+	defw	0
+	defw	48
+	defw	12288
+	defw	96
+	defw	6144
+	defw	24624
+	defw	6192
+	defw	0
+	defw	0
+	defw	120
+	defw	120
+	defw	0
+	defw	24576
+	defw	6192
+	defw	24624
+	defw	0
+	defw	55408
+	defw	12312
+	defw	32
+	defw	32
+	defw	34928
+	defw	55464
+	defw	32944
+	defw	112
+	defw	51312
+	defw	63688
+	defw	51400
+	defw	200
+	defw	51440
+	defw	61640
+	defw	51400
+	defw	240
+	defw	51312
+	defw	49344
+	defw	51392
+	defw	112
+	defw	51440
+	defw	51400
+	defw	51400
+	defw	240
+	defw	49400
+	defw	61632
+	defw	49344
+	defw	248
+	defw	49400
+	defw	61632
+	defw	49344
+	defw	192
+	defw	51312
+	defw	55488
+	defw	51400
+	defw	112
+	defw	51400
+	defw	63688
+	defw	51400
+	defw	200
+	defw	24824
+	defw	24672
+	defw	24672
+	defw	248
+	defw	2056
+	defw	2056
+	defw	51400
+	defw	112
+	defw	51400
+	defw	57552
+	defw	51408
+	defw	200
+	defw	49344
+	defw	49344
+	defw	49344
+	defw	248
+	defw	55432
+	defw	51432
+	defw	51400
+	defw	200
+	defw	51400
+	defw	59592
+	defw	51416
+	defw	200
+	defw	51312
+	defw	51400
+	defw	51400
+	defw	112
+	defw	51440
+	defw	61640
+	defw	49344
+	defw	192
+	defw	51312
+	defw	51400
+	defw	55528
+	defw	120
+	defw	51440
+	defw	61640
+	defw	51408
+	defw	200
+	defw	51312
+	defw	28864
+	defw	51208
+	defw	112
+	defw	24824
+	defw	24672
+	defw	24672
+	defw	96
+	defw	51400
+	defw	51400
+	defw	51400
+	defw	112
+	defw	51400
+	defw	51400
+	defw	20680
+	defw	32
+	defw	51400
+	defw	51400
+	defw	59592
+	defw	80
+	defw	55432
+	defw	24688
+	defw	55408
+	defw	136
+	defw	53384
+	defw	24672
+	defw	24672
+	defw	96
+	defw	6392
+	defw	24624
+	defw	49344
+	defw	248
+	defw	24696
+	defw	24672
+	defw	24672
+	defw	120
+	defw	32768
+	defw	24768
+	defw	6192
+	defw	8
+	defw	6264
+	defw	6168
+	defw	6168
+	defw	120
+	defw	28704
+	defw	8360
+	defw	8224
+	defw	32
+	defw	0
+	defw	0
+	defw	0
+	defw	252
+	defw	18480
+	defw	57416
+	defw	16448
+	defw	248
+	defw	0
+	defw	2160
+	defw	51320
+	defw	120
+	defw	49152
+	defw	61632
+	defw	51400
+	defw	240
+	defw	0
+	defw	49264
+	defw	49344
+	defw	112
+	defw	2048
+	defw	30728
+	defw	51400
+	defw	120
+	defw	0
+	defw	51312
+	defw	49392
+	defw	120
+	defw	14336
+	defw	28768
+	defw	24672
+	defw	96
+	defw	0
+	defw	51320
+	defw	30920
+	defw	28680
+	defw	49152
+	defw	61632
+	defw	51400
+	defw	200
+	defw	24576
+	defw	57344
+	defw	24672
+	defw	240
+	defw	12288
+	defw	12288
+	defw	12336
+	defw	24752
+	defw	49152
+	defw	57552
+	defw	53472
+	defw	200
+	defw	24576
+	defw	24672
+	defw	24672
+	defw	56
+	defw	0
+	defw	59600
+	defw	59624
+	defw	232
+	defw	0
+	defw	51440
+	defw	51400
+	defw	200
+	defw	0
+	defw	51312
+	defw	51400
+	defw	112
+	defw	0
+	defw	51440
+	defw	61640
+	defw	49344
+	defw	0
+	defw	51320
+	defw	30920
+	defw	6168
+	defw	0
+	defw	49272
+	defw	49344
+	defw	192
+	defw	0
+	defw	49264
+	defw	2160
+	defw	240
+	defw	24576
+	defw	24688
+	defw	24672
+	defw	56
+	defw	0
+	defw	51400
+	defw	51400
+	defw	112
+	defw	0
+	defw	51400
+	defw	28784
+	defw	32
+	defw	0
+	defw	59592
+	defw	59624
+	defw	80
+	defw	0
+	defw	55432
+	defw	55408
+	defw	136
+	defw	0
+	defw	51400
+	defw	30920
+	defw	28680
+	defw	0
+	defw	12536
+	defw	49248
+	defw	248
+	defw	24696
+	defw	49248
+	defw	24672
+	defw	120
+	defw	24672
+	defw	24672
+	defw	24672
+	defw	96
+	defw	12528
+	defw	6192
+	defw	12336
+	defw	240
+	defw	26676
+	defw	0
+	defw	0
+	defw	0
+	defw	34928
+	defw	51368
+	defw	34984
+	defw	112
 ;------------------------------
-ANYKEY   call IINKEY
-         jr   z,ANYKEY
-         push af
-ANYKEY_0 call IINKEY
-         jr   nz,ANYKEY_0
-         pop  af
-         ret
+ANYKEY	call	IINKEY
+	jr	z,ANYKEY
+	push	af
+ANYKEY_0
+	call	IINKEY
+	jr	nz,ANYKEY_0
+	pop	af
+	ret
 ;------------------------------
-IINKEY   push hl
-         push de
-         push bc
-         ld   bc,#7FFE
-         ld   h,0
-         ld   d,h
-         ld   e,h
-II1      ld   l,5
-         in   a,(c)
-II2      inc  h
-         rrca
-         jr   c,II3
-         ld   d,e
-         ld   e,h
-II3      dec  l
-         jr   nz,II2
-         rrc  b
-         jr   c,II1
-         ld   a,e
-         cp   #24
-         jr   nz,II5
-         ld   e,d
-         ld   d,#24
-II5      cp   2
-         jr   nz,II6
-         ld   e,d
-         ld   d,2
-II6      ld   hl,IINN
-         xor  a
-         xor  d
-         jr   z,II7
-         ld   hl,IISS
-         cp   2
-         jr   z,II7
-         ld   hl,IICS
-         cp   #24
-         jr   z,II7
-         ld   a,1
-         jr   II8
+IINKEY	push	hl
+	push	de
+	push	bc
+	ld	bc,#7FFE
+	ld	h,0
+	ld	d,h
+	ld	e,h
+II1	ld	l,5
+	in	a,(c)
+II2	inc	h
+	rrca
+	jr	c,II3
+	ld	d,e
+	ld	e,h
+II3	dec	l
+	jr	nz,II2
+	rrc	b
+	jr	c,II1
+	ld	a,e
+	cp	#24
+	jr	nz,II5
+	ld	e,d
+	ld	d,#24
+II5	cp	2
+	jr	nz,II6
+	ld	e,d
+	ld	d,2
+II6	ld	hl,IINN
+	xor	a
+	xor	d
+	jr	z,II7
+	ld	hl,IISS
+	cp	2
+	jr	z,II7
+	ld	hl,IICS
+	cp	#24
+	jr	z,II7
+	ld	a,1
+	jr	II8
 
-II7      ld   d,0
-         add  hl,de
-         ld   a,(hl)
-II8      and  a
-         pop  bc
-         pop  de
-         pop  hl
-         ret
+II7	ld	d,0
+	add	hl,de
+	ld	a,(hl)
+II8	and	a
+	pop	bc
+	pop	de
+	pop	hl
+	ret
 
-IINN     defb 0," ",#1C
-         defb "mnb"
-         defb 13
-         defb "lkjh"
-         defb "poiuy"
-         defb "09876"
-         defb "12345"
-         defb "qwert"
-         defb "asdfg"
-         defb 0
-         defb "zxcv"
+IINN	defb	0," ",#1C
+	defb	"mnb"
+	defb	13
+	defb	"lkjh"
+	defb	"poiuy"
+	defb	"09876"
+	defb	"12345"
+	defb	"qwert"
+	defb	"asdfg"
+	defb	0
+	defb	"zxcv"
 
-IICS     defb 0,#11,#0E
-         defb "MNB"
-         defb 2
-         defb "LKJH"
-         defb "POIUY"
-         defb #0C,#0F,9,#0B,#0A
-         defb 7,6,4,5,8
-         defb "QWERT"
-         defb "ASDFG"
-         defb #1F
-         defb "ZXCV"
+IICS	defb	0,#11,#0E
+	defb	"MNB"
+	defb	2
+	defb	"LKJH"
+	defb	"POIUY"
+	defb	#0C,#0F,9,#0B,#0A
+	defb	7,6,4,5,8
+	defb	"QWERT"
+	defb	"ASDFG"
+	defb	#1F
+	defb	"ZXCV"
 
-IISS     defb 0,16,#1E
-         defb ".,*"
-         defb 3
-         defb "=+-^"
-         defb 34 ;"
-         defb ";}{"
-         defb "_)('&"
-         defb "!@#$%"
-         defb #12,#13,#14
-         defb "<>"
-         defb "~|"
-         defb 92 ;\
-         defb 123 ;{
-         defb 125 ;}
-         defb #1D
-         defb ":`?/"
+IISS	defb	0,16,#1E
+	defb	".,*"
+	defb	3
+	defb	"=+-^"
+	defb	34 ;"
+	defb	";}{"
+	defb	"_)('&"
+	defb	"!@#$%"
+	defb	#12,#13,#14
+	defb	"<>"
+	defb	"~|"
+	defb	92 ;\
+	defb	123 ;{
+	defb	125 ;}
+	defb	#1D
+	defb	":`?/"
 
 ;------------------------------
 ;IDENTIFY:ix-adresa, a-mas/slv
 IDENTIFY
-         or   %11100000
-         ld   (ACCMODE0+1),a
-         call TST_BSY
-         ret  nz
+	or	%11100000
+	ld	(ACCMODE0+1),a
+	call	TST_BSY
+	ret	nz
 
-ACCMODE0 ld   a,0
-         out  (P_HEA),a
-         ld   a,#EC
-         out  (P_COM),a
-         call TST_DR
-         ret  nz
+ACCMODE0
+	ld	a,0
+	out	(P_HEA),a
+	ld	a,#EC
+	out	(P_COM),a
+	call	TST_DR
+	ret	nz
 
-         call RD_512
+	call	RD_512
 
-         call TST_BSY
+	call	TST_BSY
 ;
-         ret
+	ret
 
 ;fyzicke cteni jednoho LBA sectoru
 ;ix=adresa, a=mod adresace bit4=master/slave
 ;cedb= 28 bit lba sector;c-sectornumber,e-cylinderlow,d-cylinderhigh,b-head
 LBAREAD
-         or   %11100000
-;natvrdo LBA  bit6 urcuje, ze se pouzije LBA pristup        
-         ld   (HEA_REG+1),a
-         call TST_BSY
-         ret  nz
-         
-HEA_REG  ld   a,%11100000
-				 or  b
-; prictou se nejvyssi ctyri bity LBA				 
-         out  (P_HEA),a
+	or	%11100000
+;natvrdo LBA  bit6 urcuje, ze se pouzije LBA pristup
+	ld	(HEA_REG+1),a
+	call	TST_BSY
+	ret	nz
+
+HEA_REG	ld	a,%11100000
+	or	b
+; prictou se nejvyssi ctyri bity LBA
+	out	(P_HEA),a
 ;cislo hlavicky
 
-         ld   a,1
-         out  (P_HSE),a
+	ld	a,1
+	out	(P_HSE),a
 ;pocet sektoru 1*512B
 
-         ld   a,c
-         out  (P_NSE),a
+	ld	a,c
+	out	(P_NSE),a
 ;cislo sektoru od 1
 
-         ld   a,e
-         out  (P_CYL),a
-         ld   a,d
-         out  (P_CYH),a
+	ld	a,e
+	out	(P_CYL),a
+	ld	a,d
+	out	(P_CYH),a
 ;cislo cylindru
 
-         ld   a,#21
-         out  (P_COM),a
+	ld	a,#21
+	out	(P_COM),a
 
 
-         call TST_DR
-         ret  nz
+	call	TST_DR
+	ret	nz
 
-         call RD_512
-         call TST_BSY
-;         ret  nz
+	call	RD_512
+	call	TST_BSY
+;	ret	nz
 
-         ret
+	ret
 
 
 TST_BSY
-         push hl
-         ld   hl,0
+	push	hl
+	ld	hl,0
 TST1
-         dec  hl
-         ld   a,l
-         or   h
-         jr   z,TOUT1
-P84      in   a,(P_COM)
-         cp   255
-         jr   z,TST1
-         bit  7,a
-         jr   nz,TST1
-         pop  hl
-         ret
+	dec	hl
+	ld	a,l
+	or	h
+	jr	z,TOUT1
+P84	in	a,(P_COM)
+	cp	255
+	jr	z,TST1
+	bit	7,a
+	jr	nz,TST1
+	pop	hl
+	ret
 TOUT1
-         ld   a,255
-         or   a
-         pop  hl
-         ret
+	ld	a,255
+	or	a
+	pop	hl
+	ret
 ;------------------------------
 ;test BSY,DRDY,DRQ,ERR statusu
 TST_DR
-         call TST_BSY
-         ret  nz
-         bit  6,a
-         jr   z,ER6
-         bit  3,a
-         jr   z,ER3
-         bit  0,a
-         jr   nz,ER1
-         ret
-ER6      ld   a,7
-         dec  a
-         ret
-ER3      ld   a,4
-         dec  a
-         ret
-ER1      ld   a,1
-         ret
+	call	TST_BSY
+	ret	nz
+	bit	6,a
+	jr	z,ER6
+	bit	3,a
+	jr	z,ER3
+	bit	0,a
+	jr	nz,ER1
+	ret
+ER6	ld	a,7
+	dec	a
+	ret
+ER3	ld	a,4
+	dec	a
+	ret
+ER1	ld	a,1
+	ret
 ;------------------------------
 RD_512
-         ld   (DMADR1),ix
-         push hl
-         ld   hl,RD1S
-         ld   bc,RD1L*256+DMA
-RDWR1    otir
-         ld   b,#87				;WR6 enable dma
-         out  (c),b
-         pop  hl
-         ld   bc,512
-         add  hl,bc
-         ret
+	ld	(DMADR1),ix
+	push	hl
+	ld	hl,RD1S
+	ld	bc,RD1L*256+DMA
+RDWR1	otir
+	ld	b,#87			;WR6 enable dma
+	out	(c),b
+	pop	hl
+	ld	bc,512
+	add	hl,bc
+	ret
 ;------------------------------
-WR_512							;not use
-         ld   (DMADR2),ix
-         push hl
-         ld   hl,WR1S
-         ld   bc,WR1L*256+DMA
-         jr   RDWR1
+WR_512					;not use
+	ld	(DMADR2),ix
+	push	hl
+	ld	hl,WR1S
+	ld	bc,WR1L*256+DMA
+	jr	RDWR1
 
 ;---<DMA_IN>-------------------
 RD1S
-         defb 195				;WR6 #C3 reset
-         defb %01111101			;WR0 A->B, transfer
-         defw P_DAT				;source port
-         defw 511				;lenght
-         defb %00101100			;WR1 A-port,A-fixed
-         defb %00010000			;WR2 B-memory, B-increment
-         defb %10101101			;WR4 continuous,
-DMADR1   defw 0					;destination
-         defb %10010010			;WR5 ready low,CE/WAIT,stop on end of block
-         defb #CF				;WR6 load
-         defb #B3				;WR6 force ready
-RD1L     equ  $-RD1S
+	defb	195			;WR6 #C3 reset
+	defb	%01111101		;WR0 A->B, transfer
+	defw	P_DAT			;source port
+	defw	511			;lenght
+	defb	%00101100		;WR1 A-port,A-fixed
+	defb	%00010000		;WR2 B-memory, B-increment
+	defb	%10101101		;WR4 continuous,
+DMADR1	defw	0			;destination
+	defb	%10010010		;WR5 ready low,CE/WAIT,stop on end of block
+	defb	#CF			;WR6 load
+	defb	#B3			;WR6 force ready
+RD1L	equ	$-RD1S
 ;---<DMA_OUT>------------------
 
-WR1S     defb 195
-         defb %01111101
-DMADR2   defw 0
-         defw 511
-         defb %00010100
-         defb %00101000
-         defb %10101101
-         defw P_DAT
-         defb %10010010
-         defb #CF
-         defb #B3
-WR1L     equ  $-WR1S
+WR1S	defb	195
+	defb	%01111101
+DMADR2	defw	0
+	defw	511
+	defb	%00010100
+	defb	%00101000
+	defb	%10101101
+	defw	P_DAT
+	defb	%10010010
+	defb	#CF
+	defb	#B3
+WR1L	equ	$-WR1S
 ;------------------------------
 ;prohazuje vyssi a nizsi byte
 ;zkurveny system
@@ -1973,51 +1979,53 @@ PROHOD
 ;HL adresa
 ;B kolik bytu
 ;MENI: A
-         push hl
-         push bc
-         rrc  b
+	push	hl
+	push	bc
+	rrc	b
 PROHOD1
-         ld   a,(hl)
-         inc  hl
-         ld   c,(hl)
-         dec  hl
-         ld   (hl),c
-         inc  hl
-         ld   (hl),a
-         inc  hl
-         djnz PROHOD1
-         pop  bc
-         pop  hl
-         ret
+	ld	a,(hl)
+	inc	hl
+	ld	c,(hl)
+	dec	hl
+	ld	(hl),c
+	inc	hl
+	ld	(hl),a
+	inc	hl
+	djnz	PROHOD1
+	pop	bc
+	pop	hl
+	ret
 
 ;------------------------------
-D1LBA    defw 0,0,0
-D2LBA    defw 0,0,0
-LEN      equ  $-32768
-BUFFER   ;equ  25000
-					block 512
-BUFFER2  ;equ  38000
-					block 512
-zvukplay  ld c,a
-          ld a,(@playnoise)
-					or a
-					ret z
-					ld a,c        
-; 	ld a,1
-         	ld (zvukcompile+4),a
- 	        push bc
-         	call zvukcompile
-          pop bc
-zvukloop  push bc
-         	call zvukcompile+73
-         	ld bc,2500
-zvukpause dec bc
-          ld a,b
-          or c
-          jr nz,zvukpause         	
-         	pop bc
-         	djnz zvukloop
-         	ret
-    
-    
-endmodule
+D1LBA	defw	0,0,0
+D2LBA	defw	0,0,0
+LEN	equ	$-32768
+BUFFER	;equ	25000
+	block	512
+BUFFER2	;equ	38000
+	block	512
+zvukplay
+	ld	c,a
+	ld	a,(@playnoise)
+	or	a
+	ret	z
+	ld	a,c
+;	ld	a,1
+	ld	(zvukcmp+4),a
+	push	bc
+	call	zvukcmp
+	pop	bc
+zvukloop
+	push	bc
+	call	zvukcmp+73
+	ld	bc,2500
+zvukpause
+	dec	bc
+	ld	a,b
+	or	c
+	jr	nz,zvukpause
+	pop	bc
+	djnz	zvukloop
+	ret
+
+	endmodule

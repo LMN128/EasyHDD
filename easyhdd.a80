@@ -1,5 +1,6 @@
 ;LMN Patch (EasyHDD) build on Dron's HDDpatch 1.62
 ;public version for GIT
+;20200830 - zmena rychlosti portu z 2T na 3T. Pro CPU vetsi nez 7MHz uz CF nestiha
 ;version 2.07
 ;change driver identification text "HddDrive" to "HddEH207"
 ;change/speed up splash screen, removed anykey
@@ -901,7 +902,8 @@ DMA_IN		db	195		;WR6-reset
 
 ;		db	%00101100	;WR1 A-port,A-fixed
 		db	%01101100	;WR1 A-port,A-fixed,variable cycle
-		db	%11001110 	;2T no early cycle ends
+;		db	%11001110 	;2T no early cycle ends
+		db	%11001101 	;3T no early cycle ends			
 		 
 		db	%00010000	;WR2 B-memory, B-increment - standard cycle
 ;		db	%01010000	;WR2 B-memory, B-increment,variable cycle
@@ -940,8 +942,9 @@ DMA_OUT
 
 ;		db	%00101000	;WR2-PB io, fixed,
 		db	%01101000	;WR2-PB io, fixed, variable cycle
-		db	%11001110	;2T no early cycle ends
-		 
+;		db	%11001110	;2T no early cycle ends
+	    db	%11001101 	;3T no early cycle ends		
+
 		db	%10000000	;WR3
 		db	%10101101	;WR4-Write Port B (fixed destination) address to WR4.
 		dw	P_DAT

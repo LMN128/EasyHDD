@@ -843,10 +843,10 @@ TEXT16	db	16,69,"OK             "
 TEXT17	dc	16,70,"DMA Speed:"
 TEXT18	db	16,70,"Port: "
 	db	16,69
-	dc	"2T"
+	dc	"3T"
 TEXT19	db	16,70,"Memory: "
 	db	16,69
-	dc	"3T"
+	dc	"3T" 
 ;/*
 ;TEXT17	db	"Read errors:   "
 ;	dc	"    "
